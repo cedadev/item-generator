@@ -1,2 +1,7 @@
 .idea
 item_descriptions
+test_dir
+conf
+venv
+__pycache__
+*egg-info

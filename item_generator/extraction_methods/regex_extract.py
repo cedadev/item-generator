@@ -1,6 +1,12 @@
 # encoding: utf-8
 """
-Regular expression based facet extraction functions
+Regex
+-----
+
+Processor name: ``regex``
+
+Regular expression based facet extraction function
+
 """
 __author__ = 'Richard Smith'
 __date__ = '27 May 2021'
@@ -11,20 +17,21 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import re
 
 
-def string_regex(input_string: str, regex: str) -> dict:
+def regex_extract(filepath: str, regex: str = '') -> dict:
     """
-    Takes an input string (like a filepath) and a regex with
+    Takes an input string and a regex with
     named capture groups and returns a dictionary of the values
     extracted using the named capture groups.
 
-    :param input_string: string to match against
-    :param regex: pattern to match
+    :param filepath: string to match against
+    :param regex: regex pattern with named capture groups
 
-    :return: Dictionary of the values from the named capture groups
+    :return: extracted groups
     """
 
-    m = re.match(regex, input_string)
+    m = re.match(regex, filepath)
 
     if m:
         return m.groupdict()
+
     return {}
