@@ -16,6 +16,7 @@ def accepts_argprocessors(func):
     Uses the arg processors to modify the function
     arguments before being passed into the operation.
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
 
@@ -35,9 +36,34 @@ def accepts_argprocessors(func):
 
 
 def accepts_postprocessors(func):
+    """
+    Allows postprocessors to work on the output from the main
+    processor. Post processors must accept:
+
+    Args:
+        filepath
+    Kwargs:
+        source_media
+        source_dict
+        **kwargs
+
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        func(*args, **kwargs)
+        # Call the main processor
+        response = func(*args, **kwargs)
+
+        post_processors = kwargs.get('post_processors', [])
+
+        for pprocessor in post_processors:
+
+            # Extract the processor function and input kwargs
+            processor = pprocessor['processor']
+            inputs = pprocessor['inputs']
+            source_media = kwargs.get('source_media')
+
+            # Modify the response from the main processor
+            response = processor(*args, source_media, source_dict=response, **inputs)
+        return response
+
     return wrapper
-
-

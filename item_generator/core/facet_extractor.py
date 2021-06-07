@@ -17,18 +17,25 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from typing import List
+from typing import List, Callable
 
 from item_generator.item_describer import ItemDescriptions
+from .utils import ProcessorLoader, dict_merge
 
 
 class FacetExtractor:
 
     def __init__(self, conf):
         self.item_description = ItemDescriptions(conf['item_descriptions']['root_directory'])
+        self.processors = ProcessorLoader('item_generator.facet_extractors')
 
-    def get_processor(self):
-        pass
+    def get_processor(self, name: str) -> Callable:
+        """
+
+        :param name: Name of the requested processor
+        :return: processor function
+        """
+        return self.processors.get_processor(name)
 
     def get_facets(self, filepath: str, source_media: str = 'POSIX', processors: List = []) -> dict:
         """
@@ -40,9 +47,27 @@ class FacetExtractor:
 
         :return: result from the processing
         """
+        facets = {}
         for processor in processors:
+            processor_name = processor['name']
+            processor_inputs = processor.get('inputs', {})
+            post_processors = processor.get('post_processors', [])
 
-        pass
+            loaded_pprocessors = []
+            for pprocessor in post_processors:
+                pp_name = pprocessor['name']
+                loaded_pprocessors.append({
+                    'processor': self.get_processor(pp_name),
+                    'inputs': pprocessor.get('inputs',{})
+                })
+
+            p = self.get_processor(processor_name)
+
+            metadata = p(filepath, source_media=source_media, post_processors=loaded_pprocessors, **processor_inputs)
+
+            facets = dict_merge(facets, metadata)
+
+        return facets
 
     def process_file(self, filepath, source_media):
         """
@@ -54,14 +79,15 @@ class FacetExtractor:
 
         # Get dataset description file
         description = self.item_description.get_description(filepath)
-        print(description)
 
         # Get default tags
         tags = description.defaults
-        print(tags)
 
         # Execute facet extraction functions
         metadata = self.get_facets(filepath, source_media, description.extraction_methods)
+        tags.update(metadata)
+
+        print(tags)
 
         # Process multi-values
 

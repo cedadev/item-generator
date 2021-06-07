@@ -34,7 +34,8 @@ setup(
             'generate_items = item_generator.scripts.extract_facets:main',
         ],
         'item_generator.facet_extractors': [
-            'regex = item_generator.extraction_methods.regex_extract'
+            'regex = item_generator.extraction_methods:regex_extract',
+            'date_convert = item_generator.extraction_methods.postprocessors:date_convert'
         ]
     }
 )
