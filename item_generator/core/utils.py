@@ -9,7 +9,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 # Package imports
-from item_generator.extraction_methods.abstract import BaseProcessor
+from item_generator.core.base import BaseProcessor
 
 # 3rd Party Imports
 
@@ -33,7 +33,11 @@ class ProcessorLoader:
         """
         self.handlers = {}
         for entry_point in pkg_resources.iter_entry_points(entry_point_key):
-            self.handlers[entry_point.name] = entry_point.load()
+            e_point = entry_point.load()
+
+            # Only load entry points which inherit from the base class
+            if issubclass(e_point, BaseProcessor):
+                self.handlers[entry_point.name] = e_point
 
     def get_processor(self, name: str, **kwargs) -> BaseProcessor:
         """
@@ -45,12 +49,11 @@ class ProcessorLoader:
         """
         try:
             return self.handlers[name](**kwargs)
-        except KeyError:
-            LOGGER.error(f'Failed to load processor: {name}')
+        except KeyError as e:
+            LOGGER.error(f'Failed to load processor: {name} {e}')
 
 
-
-def dict_merge(*args, add_keys=True):
+def dict_merge(*args, add_keys=True) -> dict:
     assert len(args) >= 2, "dict_merge requires at least two dicts to merge"
 
     # Make a copy of the root dict
@@ -84,4 +87,5 @@ def dict_merge(*args, add_keys=True):
                         rtn_dct[k].append(list_value)
             else:
                 rtn_dct[k] = v
+
     return rtn_dct

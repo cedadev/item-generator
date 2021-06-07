@@ -22,7 +22,7 @@ from item_generator.item_describer import ItemDescriptions
 from .utils import ProcessorLoader, dict_merge
 
 from typing import List, Callable
-from item_generator.extraction_methods.abstract import BaseProcessor
+from item_generator.core.base import BaseProcessor
 
 
 class FacetExtractor:
