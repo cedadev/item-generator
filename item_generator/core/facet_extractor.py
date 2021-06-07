@@ -17,10 +17,12 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from typing import List, Callable
 
 from item_generator.item_describer import ItemDescriptions
 from .utils import ProcessorLoader, dict_merge
+
+from typing import List, Callable
+from item_generator.extraction_methods.abstract import BaseProcessor
 
 
 class FacetExtractor:
@@ -29,13 +31,41 @@ class FacetExtractor:
         self.item_description = ItemDescriptions(conf['item_descriptions']['root_directory'])
         self.processors = ProcessorLoader('item_generator.facet_extractors')
 
-    def get_processor(self, name: str) -> Callable:
+    def _load_postprocessors(self, processor: dict) -> List[BaseProcessor]:
+        """
+        Load the post processors for the given processor
+
+        :param processor: Configuration for the processor including any post processors
+
+        :return: List of loaded processors.
+        """
+
+        loaded_pprocessors = []
+
+        for pprocessor in processor.get('post_processors', []):
+            pp_name = pprocessor['name']
+            pp_kwargs = pprocessor.get('inputs', {})
+
+            loaded = self._get_processor(pp_name, **pp_kwargs)
+
+            if loaded:
+                loaded_pprocessors.append(loaded)
+
+        return loaded_pprocessors
+
+    def _load_processor(self, processor: dict) -> BaseProcessor:
+        processor_name = processor['name']
+        processor_inputs = processor.get('inputs', {})
+
+        return self._get_processor(processor_name, **processor_inputs)
+
+    def _get_processor(self, name: str, **kwargs) -> BaseProcessor:
         """
 
         :param name: Name of the requested processor
-        :return: processor function
+        :return: processor object
         """
-        return self.processors.get_processor(name)
+        return self.processors.get_processor(name, **kwargs)
 
     def get_facets(self, filepath: str, source_media: str = 'POSIX', processors: List = []) -> dict:
         """
@@ -49,22 +79,15 @@ class FacetExtractor:
         """
         facets = {}
         for processor in processors:
-            processor_name = processor['name']
-            processor_inputs = processor.get('inputs', {})
-            post_processors = processor.get('post_processors', [])
 
-            loaded_pprocessors = []
-            for pprocessor in post_processors:
-                pp_name = pprocessor['name']
-                loaded_pprocessors.append({
-                    'processor': self.get_processor(pp_name),
-                    'inputs': pprocessor.get('inputs',{})
-                })
+            # Load the processors
+            p = self._load_processor(processor)
+            post_processors = self._load_postprocessors(processor)
 
-            p = self.get_processor(processor_name)
+            # Retrieve the metadata
+            metadata = p.process(filepath, source_media=source_media, post_processors=post_processors)
 
-            metadata = p(filepath, source_media=source_media, post_processors=loaded_pprocessors, **processor_inputs)
-
+            # Merge the extracted metadata with the metadata already retrieved
             facets = dict_merge(facets, metadata)
 
         return facets

@@ -9,15 +9,19 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 # Package imports
+from item_generator.extraction_methods.abstract import BaseProcessor
 
 # 3rd Party Imports
 
 # Python imports
 import pkg_resources
+import logging
 
 # Typing imports
 import collections.abc
 from typing import Callable
+
+LOGGER = logging.getLogger(__name__)
 
 
 class ProcessorLoader:
@@ -31,7 +35,7 @@ class ProcessorLoader:
         for entry_point in pkg_resources.iter_entry_points(entry_point_key):
             self.handlers[entry_point.name] = entry_point.load()
 
-    def get_processor(self, name: str) -> Callable:
+    def get_processor(self, name: str, **kwargs) -> BaseProcessor:
         """
         Get the processor by name
 
@@ -39,7 +43,11 @@ class ProcessorLoader:
 
         :return: An callable function
         """
-        return self.handlers[name]
+        try:
+            return self.handlers[name](**kwargs)
+        except KeyError:
+            LOGGER.error(f'Failed to load processor: {name}')
+
 
 
 def dict_merge(*args, add_keys=True):
