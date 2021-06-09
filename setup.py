@@ -36,6 +36,10 @@ setup(
         'item_generator.facet_extractors': [
             'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
             'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor'
+        ],
+        'item_generator.backends': [
+            'xarray = item_generator.backends.xarray:XarrayBackend',
+            'cf = item_generator.backends.cf:CfBackend'
         ]
     }
 )
