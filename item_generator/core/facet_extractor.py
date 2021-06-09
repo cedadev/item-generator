@@ -30,10 +30,6 @@ class FacetExtractor(BaseExtractor):
 
     PROCESSOR_ENTRY_POINT = 'item_generator.facet_extractors'
 
-    def __init__(self, conf):
-        super().__init__(conf)
-        self.item_description = ItemDescriptions(conf['item_descriptions']['root_directory'])
-
     def _load_postprocessors(self, processor: dict) -> List[BaseProcessor]:
         """
         Load the post processors for the given processor
@@ -105,7 +101,7 @@ class FacetExtractor(BaseExtractor):
         print(filepath)
 
         # Get dataset description file
-        description = self.item_description.get_description(filepath)
+        description = self.item_descriptions.get_description(filepath)
 
         # Get default tags
         tags = description.defaults
