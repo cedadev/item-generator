@@ -21,8 +21,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 from asset_scanner.core import BaseExtractor
 from asset_scanner.core.utils import dict_merge
 from asset_scanner.core.processor import BaseProcessor
-
-from item_generator.item_describer import ItemDescriptions
+from asset_scanner.core.item_describer import ItemDescriptions
 
 from typing import List, Callable
 
