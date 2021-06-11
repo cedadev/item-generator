@@ -44,7 +44,7 @@ class HeaderExtract(BaseProcessor):
         return data
     
     def list_backend(self):
-        return pkg.iter_entry_points("item_generator.backends")
+        return pkg.iter_entry_points("item_generator.extraction_methods.header_extract.backends")
     
     def guess_backend(self, filepath: str, **kwargs) -> dict:
         backends = self.list_backend()
