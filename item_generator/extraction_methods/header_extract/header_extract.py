@@ -8,12 +8,14 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-import xarray as xr
 import pkg_resources as pkg
-from item_generator.core.base import BaseProcessor, BaseBackend
-from item_generator.core.decorators import accepts_postprocessors, accepts_argprocessors
+from item_generator.core.base import BaseProcessor
+from item_generator.core.decorators import accepts_postprocessors
 from typing import List
-from collections.abc import Sequence
+
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
 class HeaderExtract(BaseProcessor):
@@ -44,23 +46,31 @@ class HeaderExtract(BaseProcessor):
         return data
     
     def list_backend(self):
-        return pkg.iter_entry_points("item_generator.extraction_methods.header_extract.backends")
+        backend_entrypoints = {}
+        for pkg_ep in pkg.iter_entry_points("item_generator.extraction_methods.header_extract.backends"):
+            name = pkg_ep.name
+            try:
+                backend = pkg_ep.load()
+                backend_entrypoints[name] = backend
+            except Exception as ex:
+                LOGGER(ex)
+        return backend_entrypoints
     
     def guess_backend(self, filepath: str, **kwargs) -> dict:
         backends = self.list_backend()
-
-        for backend in backends:
+        for engine, backend in backends.items():
+            backend = backend()
             if backend.guess_can_open(filepath):
                 return backend
+        
+        raise(f"No backend found for file {filepath}")
+        
 
-        raise ValueError(
-            f"Could not find backend to open file: {filepath}"
-        )
-    
-    @accepts_argprocessors
+
     @accepts_postprocessors
     def attr_extraction(
-            backend: Sequence(BaseBackend),
+            self,
+            backend,
             file: str,
             attributes: List,
             argprocessors: List = ['posix_file'],

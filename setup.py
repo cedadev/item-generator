@@ -31,12 +31,12 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'generate_items = item_generator.scripts.extract_facets:main',
+            'generate_items = item_generator.scripts.extract_facet:main',
         ],
         'item_generator.facet_extractors': [
             'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
             'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
-            'header = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract'
+            'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract'
         ],
         'item_generator.extraction_methods.header_extract.backends': [
             'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',

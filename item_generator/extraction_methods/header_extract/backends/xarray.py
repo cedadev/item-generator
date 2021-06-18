@@ -48,7 +48,7 @@ class XarrayBackend(BaseBackend):
         :return: Dictionary of extracted attributes
         """
 
-        ds = xr.open_dataset(file, engine=self.engine, **kwargs)
+        ds = xr.open_dataset(file, engine=self.engine, decode_times=False, **kwargs)
 
         extracted_metadata = {}
         for attr in attributes:

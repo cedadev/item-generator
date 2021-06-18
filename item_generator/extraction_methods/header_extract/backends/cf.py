@@ -9,7 +9,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import cf
-from cf import file_type
+from cf.read_write.read import file_type
 from item_generator.core.base import BaseBackend
 from typing import List
 
@@ -47,13 +47,19 @@ class CfBackend(BaseBackend):
         :return: Dictionary of extracted attributes
         """
 
-        ds = cf.read(file, **kwargs)
-
+        field_list = cf.read(file, **kwargs)
+        
+        properties = {}
+        for field in field_list:
+            properties.update(field.properties())
+            if field.nc_global_attributes():
+                properties['global_attributes'] = field.nc_global_attributes()
+            
         extracted_metadata = {}
         for attr in attributes:
-
-            value = ds.attrs.get(attr)
-            if value:
-                extracted_metadata[attr] = value
+            if 'global_attributes' in properties and properties['global_attributes'][attr]:
+                extracted_metadata[attr] = properties['global_attributes'][attr]
+            elif attr in properties:
+                extracted_metadata[attr] = properties[attr]
 
         return extracted_metadata
