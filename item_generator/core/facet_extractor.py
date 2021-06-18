@@ -18,18 +18,17 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 
-from item_generator.item_describer import ItemDescriptions
-from .utils import ProcessorLoader, dict_merge
+from asset_scanner.core import BaseExtractor
+from asset_scanner.core.utils import dict_merge
+from asset_scanner.core.processor import BaseProcessor
+from asset_scanner.core.item_describer import ItemDescriptions
 
 from typing import List, Callable
-from item_generator.core.base import BaseProcessor
 
 
-class FacetExtractor:
+class FacetExtractor(BaseExtractor):
 
-    def __init__(self, conf):
-        self.item_description = ItemDescriptions(conf['item_descriptions']['root_directory'])
-        self.processors = ProcessorLoader('item_generator.facet_extractors')
+    PROCESSOR_ENTRY_POINT = 'item_generator.facet_extractors'
 
     def _load_postprocessors(self, processor: dict) -> List[BaseProcessor]:
         """
@@ -85,7 +84,7 @@ class FacetExtractor:
             post_processors = self._load_postprocessors(processor)
 
             # Retrieve the metadata
-            metadata = p.process(filepath, source_media=source_media, post_processors=post_processors)
+            metadata = p.run(filepath, source_media=source_media, post_processors=post_processors)
 
             # Merge the extracted metadata with the metadata already retrieved
             facets = dict_merge(facets, metadata)
@@ -99,9 +98,10 @@ class FacetExtractor:
         :param source_media:
         :return:
         """
+        print(filepath)
 
         # Get dataset description file
-        description = self.item_description.get_description(filepath)
+        description = self.item_descriptions.get_description(filepath)
 
         # Get default tags
         tags = description.defaults
@@ -109,8 +109,6 @@ class FacetExtractor:
         # Execute facet extraction functions
         metadata = self.get_facets(filepath, source_media, description.extraction_methods)
         tags.update(metadata)
-
-        print(tags)
 
         # Process multi-values
 
@@ -123,4 +121,5 @@ class FacetExtractor:
         # Process URIs to human terms
 
         # Generate item id
-        pass
+
+        self.output(tags)

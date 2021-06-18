@@ -35,10 +35,9 @@ def accepts_postprocessors(func):
         args = args[1:]
 
         for pprocessor in post_processors:
-            print(args, kwargs)
 
             # Modify the response from the main processor
-            response = pprocessor.process(*args, source_dict=response, **kwargs)
+            response = pprocessor.run(*args, source_dict=response, **kwargs)
         return response
 
     return wrapper
