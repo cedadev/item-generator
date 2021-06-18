@@ -14,7 +14,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 # Package imports
-from item_generator.core.base import BaseProcessor
+from asset_scanner.core.processor import BaseProcessor
 
 # 3rd Party imports
 from dateutil.parser import parse
@@ -31,7 +31,7 @@ LOGGER = logging.getLogger(__name__)
 class BasePostProcessor(BaseProcessor):
 
     @abstractmethod
-    def process(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs) -> dict:
+    def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs) -> dict:
         pass
 
 
@@ -61,7 +61,7 @@ class FacetMapProcessor(BasePostProcessor):
 
     """
 
-    def process(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
+    def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
         output = {}
 
         for k, v in source_dict.items():
@@ -108,7 +108,7 @@ class ISODateProcessor(BasePostProcessor):
 
     """
 
-    def process(self, filepath: str, source_media: str = 'POSIX', source_dict={}, **kwargs) -> dict:
+    def run(self, filepath: str, source_media: str = 'POSIX', source_dict={}, **kwargs) -> dict:
         """
         :param filepath: file currently being processed
         :param source_media: media source of the file being processed
@@ -127,5 +127,8 @@ class ISODateProcessor(BasePostProcessor):
 
                 # remove the bad date from the dict
                 source_dict.pop(self.date_key)
+        else:
+            # Clean up empty strings and non-matches
+            source_dict.pop(self.date_key, None)
 
         return source_dict

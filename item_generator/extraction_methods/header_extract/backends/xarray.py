@@ -10,11 +10,10 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import xarray as xr
 from xarray.backends.plugins import guess_engine
-from item_generator.core.base import BaseBackend
 from typing import List
 
 
-class XarrayBackend(BaseBackend):
+class XarrayBackend:
     """
     Xarray
     ------

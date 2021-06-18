@@ -28,13 +28,19 @@ setup(
         ]
     },
     install_requires=[
+        'asset_scanner',
+        'directory_tree',
+        'python-dateutil'
     ],
     entry_points={
         'console_scripts': [
             'generate_items = item_generator.scripts.extract_facet:main',
         ],
+        'asset_scanner.extractors': [
+          'item_generator = item_generator:FacetExtractor'
+        ],
         'item_generator.facet_extractors': [
-            'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
+            'filename_regex = item_generator.extraction_methods.regex_extract:FilenameRegexExtract',
             'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
             'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract'
         ],

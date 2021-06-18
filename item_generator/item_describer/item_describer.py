@@ -9,7 +9,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 # Package imports
-from item_generator.core.utils import dict_merge
+from asset_scanner.core.utils import dict_merge
 
 # 3rd Party Imports
 from directory_tree import DatasetNode, DirectoryNode
@@ -22,6 +22,8 @@ from functools import lru_cache
 
 # Typing imports
 from typing import List, Optional
+
+from datetime import datetime
 
 
 class ItemDescription:
@@ -116,7 +118,10 @@ class ItemDescriptions:
         nodes = self.tree.search_all(filepath)
         description_files = [node.description_file for node in nodes]
 
+        start = datetime.now()
         config_description = self.load_config(*description_files)
+        end = datetime.now()
+        print(f'LOADING DESCRIPTION::: Time taken: {end-start}')
 
         return ItemDescription(config_description)
 

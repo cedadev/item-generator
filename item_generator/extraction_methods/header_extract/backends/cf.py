@@ -10,11 +10,10 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import cf
 from cf.read_write.read import file_type
-from item_generator.core.base import BaseBackend
 from typing import List
 
 
-class CfBackend(BaseBackend):
+class CfBackend:
     """
     Cf
     ------
