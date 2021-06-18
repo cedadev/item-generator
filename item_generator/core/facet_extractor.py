@@ -17,17 +17,19 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-
 from asset_scanner.core import BaseExtractor
-from asset_scanner.core.utils import dict_merge
+from asset_scanner.core.utils import dict_merge, generate_id
 from asset_scanner.core.processor import BaseProcessor
-from asset_scanner.core.item_describer import ItemDescriptions
+from asset_scanner.core.item_describer import ItemDescriptions, ItemDescription
+
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 from typing import List, Callable
 
 
 class FacetExtractor(BaseExtractor):
-
     PROCESSOR_ENTRY_POINT = 'item_generator.facet_extractors'
 
     def _load_postprocessors(self, processor: dict) -> List[BaseProcessor]:
@@ -66,7 +68,25 @@ class FacetExtractor(BaseExtractor):
         """
         return self.processors.get_processor(name, **kwargs)
 
-    def get_facets(self, filepath: str, source_media: str = 'POSIX', processors: List = []) -> dict:
+    @staticmethod
+    def _generate_item_id(filepath, tags, description):
+
+        has_all_facets = all([facet in tags for facet in description.aggregation_facets])
+
+        if has_all_facets:
+            id_string = ''
+            for facet in description.aggregation_facets:
+                vals = tags.get(facet)
+                if isinstance(vals, (str, int)):
+                    id_string = '.'.join((id_string, vals))
+                if isinstance(vals, (list)):
+                    id_string = '.'.join((id_string, f'multi_{facet}'))
+
+            return generate_id(id_string)
+
+        return generate_id(filepath)
+
+    def get_facets(self, filepath: str, description: ItemDescription, source_media: str = 'POSIX', ) -> dict:
         """
         Extract the raw facets from the file based on the listed processors
 
@@ -76,9 +96,13 @@ class FacetExtractor(BaseExtractor):
 
         :return: result from the processing
         """
-        facets = {}
-        for processor in processors:
+        # Get default tags
+        tags = description.defaults
 
+        # Execute facet extraction functions
+        processors = description.extraction_methods
+
+        for processor in processors:
             # Load the processors
             p = self._load_processor(processor)
             post_processors = self._load_postprocessors(processor)
@@ -87,28 +111,7 @@ class FacetExtractor(BaseExtractor):
             metadata = p.run(filepath, source_media=source_media, post_processors=post_processors)
 
             # Merge the extracted metadata with the metadata already retrieved
-            facets = dict_merge(facets, metadata)
-
-        return facets
-
-    def process_file(self, filepath, source_media):
-        """
-        Method to outline the processing pipeline for an individual file
-        :param filepath:
-        :param source_media:
-        :return:
-        """
-        print(filepath)
-
-        # Get dataset description file
-        description = self.item_descriptions.get_description(filepath)
-
-        # Get default tags
-        tags = description.defaults
-
-        # Execute facet extraction functions
-        metadata = self.get_facets(filepath, source_media, description.extraction_methods)
-        tags.update(metadata)
+            tags = dict_merge(tags, metadata)
 
         # Process multi-values
 
@@ -120,6 +123,40 @@ class FacetExtractor(BaseExtractor):
 
         # Process URIs to human terms
 
-        # Generate item id
+        return tags
 
-        self.output(tags)
+    def process_file(self, filepath, source_media):
+        """
+        Method to outline the processing pipeline for an individual file
+        :param filepath:
+        :param source_media:
+        :return:
+        """
+        LOGGER.info(f'Processing: {filepath}')
+
+        # Get dataset description file
+        description = self.item_descriptions.get_description(filepath)
+
+        tags = self.get_facets(filepath, description, source_media)
+
+        # Generate item id
+        id = self._generate_item_id(filepath, tags, description)
+
+        output = {
+            'id': id,
+            'body': {
+                'properties': tags
+            }
+        }
+
+        # Output the item
+        self.output(output, namespace='facets')
+
+        # Add item id to asset
+        output = {
+            'id': generate_id(filepath),
+            'body': {
+                'collection_id': id
+            }
+        }
+        self.output(output, namespace='assets')
