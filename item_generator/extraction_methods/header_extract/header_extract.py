@@ -9,7 +9,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import pkg_resources as pkg
-from item_generator.core.base import BaseProcessor
+from asset_scanner.core.processor import BaseProcessor
 from item_generator.core.decorators import accepts_postprocessors
 from typing import List
 
@@ -28,15 +28,13 @@ class HeaderExtract(BaseProcessor):
 
 
     Description:
-        Takes an input string and a regex with
-        named capture groups and returns a dictionary of the values
-        extracted using the named capture groups.
+        Takes a filepath string and a list of attributes
+        and returns a dictionary of the values extracted from the 
+        file header.
 
-    Configuration Options:
-        `header`: The regular expression to match against the filepath
     """
     @accepts_postprocessors
-    def process(self, filepath: str, attributes: List, **kwargs) -> dict:
+    def run(self, filepath: str, attributes: List, **kwargs) -> dict:
 
         backend = self.guess_backend(filepath)
 
