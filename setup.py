@@ -32,6 +32,13 @@ setup(
         'directory_tree',
         'python-dateutil'
     ],
+    extras_require={
+        'docs': [
+            'sphinx',
+            'sphinx-rtd-theme',
+            'sphinx_fontawesome'
+        ]
+    },
     entry_points={
         'console_scripts': [
             'generate_items = item_generator.scripts.extract_facet:main',

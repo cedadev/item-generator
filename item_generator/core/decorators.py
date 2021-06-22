@@ -1,5 +1,13 @@
 # encoding: utf-8
 """
+Decorators
+-----------
+
+Decorators allow the user to modify the input and out from the processors.
+
+:py:mod:`item_generator.extraction_methods.preprocessors` allow modification of the input arguments.
+
+:py:mod:`item_generator.extraction_methods.postprocessors` modify the output dictionary.
 
 """
 __author__ = 'Richard Smith'
@@ -13,14 +21,13 @@ from functools import wraps
 
 def accepts_preprocessors(func):
     """
-    Allows preprocessors to work on the input arguments
+    Allows preprocessors to work on the input arguments. Uses the key
+    ``pre_processors`` from the processor description.
 
-    Args:
-        filepath
-    Kwargs
-        source_media
-        **kwargs
-
+    :param filepath: path to the file
+    :param source_media: the source media
+    :param pre_processors: list of pre_processors to run
+    :param kwargs: additional kwargs passed to the wrapped processor
     """
 
     @wraps(func)
@@ -44,14 +51,13 @@ def accepts_preprocessors(func):
 def accepts_postprocessors(func):
     """
     Allows postprocessors to work on the output from the main
-    processor. Post processors must accept:
+    processor.  Uses the key ``post_processors`` from the processor description.
 
-    Args:
-        filepath
-    Kwargs:
-        source_media
-        source_dict
-        **kwargs
+    :param filepath: Path to the file
+    :param source_media: The source media type
+    :param source_dict: The output dict from the wrapped processor
+    :param post_processors: List of post processors to run
+    :param kwargs: Additional kwargs passed to post processor
 
     """
     @wraps(func)

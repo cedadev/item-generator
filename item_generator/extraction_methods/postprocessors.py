@@ -1,5 +1,7 @@
 # encoding: utf-8
 """
+.. _post-processors:
+
 Post Processors
 ----------------
 

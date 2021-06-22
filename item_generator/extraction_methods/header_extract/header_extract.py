@@ -20,11 +20,15 @@ LOGGER = logging.getLogger(__name__)
 
 class HeaderExtract(BaseProcessor):
     """
-    Header
-    ------
 
-    Processor Name: ``header``
-    Accepts Post-Processors: yes
+    .. list-table::
+
+        * - Processor Name
+          - ``header_extract``
+        * - Accepts Pre-processors
+          - .. fa:: times
+        * - Accepts Post-processors
+          - .. fa:: check
 
 
     Description:

@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Core &mdash; item_generator  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Extraction Methods" href="extraction_methods.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> item_generator
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extraction_methods.html">Extraction Methods</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#decorators">Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">item_generator</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/core.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-item_generator.core">
+<span id="core"></span><h1>Core<a class="headerlink" href="#module-item_generator.core" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-item_generator.core.decorators"></span><section id="decorators">
+<h2>Decorators<a class="headerlink" href="#decorators" title="Permalink to this headline">¶</a></h2>
+<p>Decorators allow the user to modify the input and out from the processors.</p>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">item_generator.extraction_methods.preprocessors</span></code> allow modification of the input arguments.</p>
+<p><a class="reference internal" href="extraction_methods.html#module-item_generator.extraction_methods.postprocessors" title="item_generator.extraction_methods.postprocessors"><code class="xref py py-mod docutils literal notranslate"><span class="pre">item_generator.extraction_methods.postprocessors</span></code></a> modify the output dictionary.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="item_generator.core.decorators.accepts_postprocessors">
+<span class="sig-prename descclassname"><span class="pre">item_generator.core.decorators.</span></span><span class="sig-name descname"><span class="pre">accepts_postprocessors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#item_generator.core.decorators.accepts_postprocessors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows postprocessors to work on the output from the main
+processor.  Uses the key <code class="docutils literal notranslate"><span class="pre">post_processors</span></code> from the processor description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – Path to the file</p></li>
+<li><p><strong>source_media</strong> – The source media type</p></li>
+<li><p><strong>source_dict</strong> – The output dict from the wrapped processor</p></li>
+<li><p><strong>post_processors</strong> – List of post processors to run</p></li>
+<li><p><strong>kwargs</strong> – Additional kwargs passed to post processor</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="item_generator.core.decorators.accepts_preprocessors">
+<span class="sig-prename descclassname"><span class="pre">item_generator.core.decorators.</span></span><span class="sig-name descname"><span class="pre">accepts_preprocessors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#item_generator.core.decorators.accepts_preprocessors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows preprocessors to work on the input arguments. Uses the key
+<code class="docutils literal notranslate"><span class="pre">pre_processors</span></code> from the processor description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – path to the file</p></li>
+<li><p><strong>source_media</strong> – the source media</p></li>
+<li><p><strong>pre_processors</strong> – list of pre_processors to run</p></li>
+<li><p><strong>kwargs</strong> – additional kwargs passed to the wrapped processor</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<span class="target" id="module-item_generator.core.facet_extractor"></span><section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">item_descriptions</span><span class="p">:</span>
+    <span class="nt">root_directory</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/root/descriptions</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">item_generator.core.facet_extractor.</span></span><span class="sig-name descname"><span class="pre">FacetExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor.get_facets">
+<span class="sig-name descname"><span class="pre">get_facets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">asset_scanner.core.item_describer.ItemDescription</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_media</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'POSIX'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor.get_facets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the raw facets from the file based on the listed processors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – Path to the file</p></li>
+<li><p><strong>source_media</strong> – The source media type (POSIX, Object, Tape)</p></li>
+<li><p><strong>processors</strong> – List of processing functions to call to extract the facets</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>result from the processing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor.process_file">
+<span class="sig-name descname"><span class="pre">process_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_media</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor.process_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to outline the processing pipeline for an individual file
+:param filepath:
+:param source_media:
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="extraction_methods.html" class="btn btn-neutral float-left" title="Extraction Methods" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Rhys Evans, Richard Smith.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

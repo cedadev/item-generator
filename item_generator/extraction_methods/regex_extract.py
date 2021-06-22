@@ -1,5 +1,7 @@
 # encoding: utf-8
 """
+Regex
+------
 """
 __author__ = 'Richard Smith'
 __date__ = '27 May 2021'
@@ -20,12 +22,15 @@ import os
 
 class RegexExtract(BaseProcessor):
     """
-    Regex
-    ------
 
-    Processor Name: ``regex``
-    Accepts Pre-Processors: yes
-    Accepts Post-Processors: yes
+    .. list-table::
+
+        * - Processor Name
+          - ``regex``
+        * - Accepts Pre-processors
+          - .. fa:: check
+        * - Accepts Post-processors
+          - .. fa:: check
 
 
     Description:
