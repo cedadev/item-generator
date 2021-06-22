@@ -42,7 +42,12 @@ setup(
         'item_generator.facet_extractors': [
             'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
             'filename_regex = item_generator.extraction_methods.regex_extract:FilenameRegexExtract',
-            'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor'
+        ],
+        'item_generator.pre_processors': [
+            'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName'
+        ],
+        'item_generator.post_processors': [
+            'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
         ]
     }
 )

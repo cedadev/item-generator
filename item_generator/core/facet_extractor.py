@@ -32,18 +32,19 @@ from typing import List, Callable
 class FacetExtractor(BaseExtractor):
     PROCESSOR_ENTRY_POINT = 'item_generator.facet_extractors'
 
-    def _load_postprocessors(self, processor: dict) -> List[BaseProcessor]:
+    def _load_extra_processors(self, processor: dict, key: str) -> List[BaseProcessor]:
         """
         Load the post processors for the given processor
 
-        :param processor: Configuration for the processor including any post processors
+        :param processor: Configuration for the processor including any post processor
+        :param key: The name of the key which holds the list of extra processors
 
         :return: List of loaded processors.
         """
 
         loaded_pprocessors = []
 
-        for pprocessor in processor.get('post_processors', []):
+        for pprocessor in processor.get(key, []):
             pp_name = pprocessor['name']
             pp_kwargs = pprocessor.get('inputs', {})
 
@@ -105,10 +106,12 @@ class FacetExtractor(BaseExtractor):
         for processor in processors:
             # Load the processors
             p = self._load_processor(processor)
-            post_processors = self._load_postprocessors(processor)
+            pre_processors = self._load_extra_processors(processor, 'pre_processors')
+            post_processors = self._load_extra_processors(processor, 'post_processors')
+
 
             # Retrieve the metadata
-            metadata = p.run(filepath, source_media=source_media, post_processors=post_processors)
+            metadata = p.run(filepath, source_media=source_media, post_processors=post_processors, pre_processors=pre_processors)
 
             # Merge the extracted metadata with the metadata already retrieved
             tags = dict_merge(tags, metadata)
@@ -145,6 +148,7 @@ class FacetExtractor(BaseExtractor):
         output = {
             'id': id,
             'body': {
+                'type': 'item',
                 'properties': tags
             }
         }
