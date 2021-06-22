@@ -2,3 +2,5 @@
 
 Package to process files, extract facets and generate an item identifier
 which can be used to aggregate like files into groups with common metadata.
+
+[Documentation](https://cedadev.github.io/item-generator/)
