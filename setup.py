@@ -36,7 +36,8 @@ setup(
         'docs': [
             'sphinx',
             'sphinx-rtd-theme',
-            'sphinx_fontawesome'
+            'sphinx_fontawesome',
+            'sphinxcontrib-programoutput'
         ]
     },
     entry_points={

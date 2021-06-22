@@ -1,10 +1,5 @@
 # encoding: utf-8
 """
-.. _pre-processors:
-
-Pre Processors
----------------
-
 Pre processors operate on the input arguments for the main processor.
 
 They can be used to manipuate the input arguments for a given processor to
@@ -22,6 +17,7 @@ import abc
 
 import os
 
+
 class BasePreProcessor(BaseProcessor):
 
     @abc.abstractmethod
@@ -31,12 +27,18 @@ class BasePreProcessor(BaseProcessor):
 
 class ReducePathtoName(BasePreProcessor):
     """
-    Filename Reducer
-    ----------------
 
-    Processor Name: `filename_reducer`
+    Processor Name: ``filename_reducer``
 
-    Takes a file path and returns the filename using `os.path.basename`.
+    Description:
+        Takes a file path and returns the filename using `os.path.basename`.
+
+    Example Configuration:
+
+    .. code-block:: yaml
+
+          pre_processors:
+            - name: filename_reducer
 
     """
 

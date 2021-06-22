@@ -30,11 +30,25 @@ class HeaderExtract(BaseProcessor):
         * - Accepts Post-processors
           - .. fa:: check
 
-
     Description:
         Takes a filepath string and a list of attributes
         and returns a dictionary of the values extracted from the 
         file header.
+
+    Configuration Options:
+        - ``attributes``: A list of attributes to match agains the filePath
+        - ``post_processors``: List of post_processors to apply
+
+    Example configuration:
+        .. code-block:: yaml
+
+            - name: header_extract
+              inputs:
+                attributes:
+                    - institution
+                    - sensor
+                    - platform
+
 
     """
     @accepts_postprocessors

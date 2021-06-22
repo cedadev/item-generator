@@ -1,9 +1,5 @@
 # encoding: utf-8
 """
-Processors
-----------
-
-
 """
 __author__ = 'Richard Smith'
 __date__ = '27 May 2021'

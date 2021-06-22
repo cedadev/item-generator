@@ -16,8 +16,11 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
   
 
   
@@ -42,7 +45,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation Guide" href="install.html" /> 
+    <link rel="next" title="Extraction Methods" href="extraction_methods.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,7 +92,6 @@
             
               <p class="caption"><span class="caption-text">User guide:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extraction_methods.html">Extraction Methods</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API</span></p>
@@ -164,15 +166,99 @@
             
   <section id="item-generator">
 <h1>Item Generator<a class="headerlink" href="#item-generator" title="Permalink to this headline">¶</a></h1>
+<p>This library aims to be a generic tool for generating JSON documents which are <a class="reference external" href="https://github.com/radiantearth/stac-spec/">STAC</a>-like.
+You should be able to generate fully STAC compliant JSON or generate content which contains
+all the relevant information to allow you to construct a valid <a class="reference external" href="https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md">STAC item</a>.</p>
+<p>This library works on the premise that you can build a processing chain for each of your datasets
+by chaining together different processors to extract the relevant information. The core facet
+extraction chain works on an atomic basis, where input plugins provide a single object for inspection
+and output a single JSON object. Item IDs are generated based on selected facets. It is then
+up to your downstream processing to aggregate this information together.</p>
+<p>Datastores such as Elasticsearch can make use of upserts which will merge the JSON documents in indexing.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>At present, not all the required libraries are available via package managers. To install, you’ll
+need to install the dependencies using the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git clone https://github.com/cedadev/item-generator
+<span class="gp">$ </span><span class="nb">cd</span> item-generator
+<span class="gp">$ </span>pip install -r requirements.txt
+<span class="gp">$ </span>pip install .
+</pre></div>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Configuration takes the form a YAML formatted file.
+Configuration for the extraction pipelines is in the form of the item description files. These YAML files specify
+the <a class="reference internal" href="extraction_methods.html#extraction-methods"><span class="std std-ref">processors</span></a> to use.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">extractor</span></code></p></td>
+<td><p>The python import path to the extractor class. If not specified, it picks up the
+class installed with the entry point <code class="docutils literal notranslate"><span class="pre">asset_scanner.extractors</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">item_descriptions.root_directory</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">REQUIRED</span></code> Path to the top level directory containing your dataset specific pipelines</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inputs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">REQUIRED</span></code> Must have at least one <a class="reference external" href="https://cedadev.github.io/asset-scanner/input_plugins.html">input plugin</a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">outputs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">REQUIRED</span></code> Must have at least one <a class="reference external" href="https://cedadev.github.io/asset-scanner/output_plugins.html">output plugin</a></p></td>
+</tr>
+</tbody>
+</table>
+<section id="sample-configuration">
+<h3>Sample configuration:<a class="headerlink" href="#sample-configuration" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">item_descriptions</span><span class="p">:</span>
+  <span class="nt">root_directory</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/etc/item-generator/item_descriptions/descriptions</span>
+<span class="nt">inputs</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">file_system</span>
+    <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/badc/faam/data/2005/b069-jan-05</span>
+<span class="nt">outputs</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">standard_out</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>The tool is called using the <a class="reference external" href="https://cedadev.github.io/asset-scanner/usage.html">asset-scanner</a></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: asset_scanner [-h] conf
+
+Run the asset scanner as configured
+
+positional arguments:
+  conf        Path to a yaml configuration file
+
+optional arguments:
+  -h, --help  show this help message and exit
+</pre></div>
+</div>
+<p>Example:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>asset_scanner conf/conf.yml
+</pre></div>
+</div>
+</div></blockquote>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">User guide:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extraction_methods.html">Extraction Methods</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="extraction_methods.html#processors">Processors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extraction_methods.html#header-extract">Header Extract</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extraction_methods.html#regex">Regex</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extraction_methods.html#post-processors">Post Processors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extraction_methods.html#module-item_generator.extraction_methods.preprocessors">Pre Processors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extraction_methods.html#module-item_generator.extraction_methods.postprocessors">Post Processors</a></li>
 </ul>
 </li>
 </ul>
@@ -189,12 +275,13 @@
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><span class="xref std std-ref">genindex</span></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</section>
 </section>
 
 
@@ -203,7 +290,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="install.html" class="btn btn-neutral float-right" title="Installation Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="extraction_methods.html" class="btn btn-neutral float-right" title="Extraction Methods" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

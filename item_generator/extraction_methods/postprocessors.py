@@ -1,10 +1,5 @@
 # encoding: utf-8
 """
-.. _post-processors:
-
-Post Processors
-----------------
-
 Post processors operate on the output from a main processor.
 They are used using the same interface as a main processor ``process``
 but they accept the result of the previous step as part of the ``process`` signature.
@@ -39,7 +34,6 @@ class BasePostProcessor(BaseProcessor):
 
 class FacetMapProcessor(BasePostProcessor):
     """
-    Facet Map Processor
 
     Processor Name: ``facet_map``
 
