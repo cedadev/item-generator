@@ -37,7 +37,7 @@ Configuration
 
 Configuration takes the form a YAML formatted file.
 Configuration for the extraction pipelines is in the form of the item description files. These YAML files specify
-the :ref:`processors <extraction-methods>` to use.
+the :ref:`processors <processors>` to use.
 
 .. list-table::
    :header-rows: 1

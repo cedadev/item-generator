@@ -1,11 +1,9 @@
-.. _extraction-methods:
+.. _processors:
+
 
 ******************
-Extraction Methods
-******************
-
 Processors
-==========
+******************
 
 Processors take a file and return a dictionary of extracted information. They
 can be chained, one after the other and the results are merged such that arrays
