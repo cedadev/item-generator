@@ -85,7 +85,7 @@ Example:
    :maxdepth: 2
    :caption: User guide:
 
-   extraction_methods
+   processors
 
 .. toctree::
    :maxdepth: 2
@@ -96,6 +96,5 @@ Example:
 Indices and tables
 ==================
 
-* :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
