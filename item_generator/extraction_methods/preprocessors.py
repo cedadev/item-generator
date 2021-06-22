@@ -1,6 +1,8 @@
 # encoding: utf-8
 """
-Pre-Processors
+.. _pre-processors:
+
+Pre Processors
 ---------------
 
 Pre processors operate on the input arguments for the main processor.

@@ -32,16 +32,27 @@ setup(
         'directory_tree',
         'python-dateutil'
     ],
+    extras_require={
+        'docs': [
+            'sphinx',
+            'sphinx-rtd-theme',
+            'sphinx_fontawesome'
+        ]
+    },
     entry_points={
         'console_scripts': [
-            'generate_items = item_generator.scripts.extract_facets:main',
+            'generate_items = item_generator.scripts.extract_facet:main',
         ],
         'asset_scanner.extractors': [
           'item_generator = item_generator:FacetExtractor'
         ],
         'item_generator.facet_extractors': [
             'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
-            'filename_regex = item_generator.extraction_methods.regex_extract:FilenameRegexExtract',
+            'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract'
+        ],
+        'item_generator.facet_extractors.header_extract.backends': [
+            'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',
+            'cf = item_generator.extraction_methods.header_extract.backends.cf:CfBackend'
         ],
         'item_generator.pre_processors': [
             'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName'
