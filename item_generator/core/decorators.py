@@ -11,6 +11,36 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 from functools import wraps
 
 
+def accepts_preprocessors(func):
+    """
+    Allows preprocessors to work on the input arguments
+
+    Args:
+        filepath
+    Kwargs
+        source_media
+        **kwargs
+
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+
+        pre_processors = kwargs.get('pre_processors', [])
+
+        # Remove the reference to self
+        self = args[0]
+        args = args[1:]
+
+        for pprocessor in pre_processors:
+            # Modify the input arguments
+            args, kwargs = pprocessor.run(*args, **kwargs)
+
+        response = func(self, *args, **kwargs)
+        return response
+    return wrapper
+
+
 def accepts_postprocessors(func):
     """
     Allows postprocessors to work on the output from the main

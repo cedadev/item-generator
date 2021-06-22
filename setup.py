@@ -40,13 +40,18 @@ setup(
           'item_generator = item_generator:FacetExtractor'
         ],
         'item_generator.facet_extractors': [
-            'filename_regex = item_generator.extraction_methods.regex_extract:FilenameRegexExtract',
-            'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
+            'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
             'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract'
         ],
-        'item_generator.extraction_methods.header_extract.backends': [
+        'item_generator.facet_extractors.header_extract.backends': [
             'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',
             'cf = item_generator.extraction_methods.header_extract.backends.cf:CfBackend'
+        ],
+        'item_generator.pre_processors': [
+            'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName'
+        ],
+        'item_generator.post_processors': [
+            'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
         ]
     }
 )
