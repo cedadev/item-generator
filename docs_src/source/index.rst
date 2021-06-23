@@ -36,7 +36,7 @@ Configuration
 =============
 
 Configuration takes the form a YAML formatted file.
-Configuration for the extraction pipelines is in the form of the item description files. These YAML files specify
+Configuration for the extraction pipelines is in the form of the `item description files <https://cedadev.github.io/asset-scanner/item_descriptions.html>`_. These YAML files specify
 the :ref:`processors <processors>` to use.
 
 .. list-table::
