@@ -139,7 +139,7 @@ class FacetExtractor(BaseExtractor):
 
         # Get dataset description file
         description = self.item_descriptions.get_description(filepath)
-
+        
         # TODO: This section should return a dict for merging. Allows processors to add
         # metadata outside the properties section. Can use the dict merge function for
         # deep dictionary merging.
