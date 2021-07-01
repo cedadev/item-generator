@@ -140,6 +140,9 @@ class FacetExtractor(BaseExtractor):
         # Get dataset description file
         description = self.item_descriptions.get_description(filepath)
 
+        # TODO: This section should return a dict for merging. Allows processors to add
+        # metadata outside the properties section. Can use the dict merge function for
+        # deep dictionary merging.
         tags = self.get_facets(filepath, description, source_media)
 
         # Generate item id
@@ -148,6 +151,7 @@ class FacetExtractor(BaseExtractor):
         output = {
             'id': id,
             'body': {
+                'item_id': id,
                 'type': 'item',
                 'properties': tags
             }
