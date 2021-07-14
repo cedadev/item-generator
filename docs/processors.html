@@ -39,6 +39,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/js/external_links.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -182,7 +183,7 @@
 <span id="id1"></span><h1>Processors<a class="headerlink" href="#processors" title="Permalink to this headline">¶</a></h1>
 <p>Processors take a file and return a dictionary of extracted information. They
 can be chained, one after the other and the results are merged such that arrays
-are appended to and key:value pairs are overwritten by subsequent write operations. If</p>
+are appended to and key:value pairs are overwritten by subsequent write operations.</p>
 <p>Some processors can also take <a class="reference internal" href="#pre-processors"><span class="std std-ref">Pre Processors</span></a> and <a class="reference internal" href="#post-processors"><span class="std std-ref">Post Processors</span></a>. Pre-processors modify
 the input arguments whilst post-processors modify the output from the main processor.</p>
 <table class="docutils align-default">
@@ -200,7 +201,7 @@ the input arguments whilst post-processors modify the output from the main proce
 <td><p>Takes a filepath string and a list of attributes and returns a dictionary of the values extracted from the file header.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#regex"><span class="std std-ref">regex</span></a></p></td>
-<td><p>Takes a filepath string and a list of attributes and returns a dictionary of the values extracted from the file header.</p></td>
+<td><p>Takes an input string and a regex with named capture groups and returns a dictionary of the values extracted using the named capture groups.</p></td>
 </tr>
 </tbody>
 </table>

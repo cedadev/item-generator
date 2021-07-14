@@ -36,8 +36,6 @@ Configuration
 =============
 
 Configuration takes the form a YAML formatted file.
-Configuration for the extraction pipelines is in the form of the `item description files <https://cedadev.github.io/asset-scanner/item_descriptions.html>`_. These YAML files specify
-the :ref:`processors <processors>` to use.
 
 .. list-table::
    :header-rows: 1
@@ -66,6 +64,12 @@ Sample configuration:
           path: /badc/faam/data/2005/b069-jan-05
       outputs:
         - name: standard_out
+
+Configuration for the extraction pipelines is done separately. This could be stored in a different
+repository to manage versions and additions from multiple sources. You could then clone or download
+this repository and reference it using the ``item_descriptions.root_directory``.
+These pipeline files are in the form of `item description files <https://cedadev.github.io/asset-scanner/item_descriptions.html>`_.
+These YAML files specify the :ref:`processors <processors>` to use to extract your desired facets.
 
 
 Usage

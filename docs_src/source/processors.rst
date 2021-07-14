@@ -7,7 +7,7 @@ Processors
 
 Processors take a file and return a dictionary of extracted information. They
 can be chained, one after the other and the results are merged such that arrays
-are appended to and key:value pairs are overwritten by subsequent write operations. If
+are appended to and key:value pairs are overwritten by subsequent write operations.
 
 Some processors can also take :ref:`pre-processors` and :ref:`post-processors`. Pre-processors modify
 the input arguments whilst post-processors modify the output from the main processor.
