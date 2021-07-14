@@ -58,4 +58,8 @@ html_css_files = [
     'css/custom.css'
 ]
 
+html_js_files = [
+    'js/external_links.js'
+]
+
 html_favicon = '_static/favicon.ico'

@@ -39,6 +39,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/js/external_links.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -188,9 +189,7 @@ need to install the dependencies using the <code class="docutils literal notrans
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<p>Configuration takes the form a YAML formatted file.
-Configuration for the extraction pipelines is in the form of the <a class="reference external" href="https://cedadev.github.io/asset-scanner/item_descriptions.html">item description files</a>. These YAML files specify
-the <a class="reference internal" href="processors.html#processors"><span class="std std-ref">processors</span></a> to use.</p>
+<p>Configuration takes the form a YAML formatted file.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 50%" />
@@ -230,6 +229,11 @@ class installed with the entry point <code class="docutils literal notranslate">
 </pre></div>
 </div>
 </div></blockquote>
+<p>Configuration for the extraction pipelines is done separately. This could be stored in a different
+repository to manage versions and additions from multiple sources. You could then clone or download
+this repository and reference it using the <code class="docutils literal notranslate"><span class="pre">item_descriptions.root_directory</span></code>.
+These pipeline files are in the form of <a class="reference external" href="https://cedadev.github.io/asset-scanner/item_descriptions.html">item description files</a>.
+These YAML files specify the <a class="reference internal" href="processors.html#processors"><span class="std std-ref">processors</span></a> to use to extract your desired facets.</p>
 </section>
 </section>
 <section id="usage">
