@@ -20,6 +20,9 @@ from asset_scanner.core.processor import BaseProcessor
 # Python imports
 import re
 import os
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
 class RegexExtract(BaseProcessor):
@@ -66,6 +69,8 @@ class RegexExtract(BaseProcessor):
         m = re.match(self.regex, filepath)
 
         if m:
+            LOGGER.info("Found matches for regex extract")
             return m.groupdict()
 
+        LOGGER.debug("No matches found for regex extract")
         return {}

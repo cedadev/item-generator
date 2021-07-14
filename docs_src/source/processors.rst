@@ -20,7 +20,7 @@ the input arguments whilst post-processors modify the output from the main proce
     * - :ref:`header_extract <header-extract>`
       - Takes a filepath string and a list of attributes and returns a dictionary of the values extracted from the file header.
     * - :ref:`regex <regex>`
-      - Takes a filepath string and a list of attributes and returns a dictionary of the values extracted from the file header.
+      - Takes an input string and a regex with named capture groups and returns a dictionary of the values extracted using the named capture groups.
 
 
 .. automodule:: item_generator.extraction_methods.header_extract

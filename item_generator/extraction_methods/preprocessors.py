@@ -17,6 +17,10 @@ import abc
 
 import os
 
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
 
 class BasePreProcessor(BaseProcessor):
 
@@ -45,6 +49,8 @@ class ReducePathtoName(BasePreProcessor):
     def run(self, filepath: str, source_media: str = 'POSIX', **kwargs):
 
         filepath = os.path.basename(filepath)
+
+        LOGGER.info(f'Identified file name: {filepath}')
 
         return (filepath, source_media), kwargs
 
