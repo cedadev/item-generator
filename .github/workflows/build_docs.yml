@@ -3,7 +3,7 @@ name: Sphinx docs to gh-pages
 on:
   push:
     branches:
-      - issue/5/autodoc
+      - master
 
 jobs:
   sphinx_docs_to_gh-pages:
@@ -24,6 +24,6 @@ jobs:
       - name: Running the Sphinx to gh-pages Action
         uses: uibcdf/action-sphinx-docs-to-gh-pages@v1.0-beta.1
         with:
-          branch: issue/5/autodoc
-          dir_docs: docs_src/source
+          branch: master
+          dir_docs: docs/source
           sphinxopts: ''
