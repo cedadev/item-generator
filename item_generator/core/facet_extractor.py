@@ -17,20 +17,26 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from asset_scanner.core import BaseExtractor
-from asset_scanner.core.utils import dict_merge, generate_id
-from asset_scanner.core.processor import BaseProcessor
-from asset_scanner.core.item_describer import ItemDescriptions, ItemDescription
-
 import logging
+
+from asset_scanner.core import BaseExtractor
+from asset_scanner.core.item_describer import ItemDescription, ItemDescriptions
+from asset_scanner.core.processor import BaseProcessor
+from asset_scanner.core.utils import dict_merge, generate_id
 
 LOGGER = logging.getLogger(__name__)
 
-from typing import List, Callable
+from typing import List
 
 
 class FacetExtractor(BaseExtractor):
     PROCESSOR_ENTRY_POINT = 'item_generator.facet_extractors'
+
+    def __init__(self, conf: dict):
+        super().__init__(conf)
+
+        self.pre_processors = self.load_processors(entrypoint='item_generator.pre_processors')
+        self.post_processors = self.load_processors(entrypoint='item_generator.post_processors')
 
     def _load_extra_processors(self, processor: dict, key: str) -> List[BaseProcessor]:
         """
@@ -48,7 +54,7 @@ class FacetExtractor(BaseExtractor):
             pp_name = pprocessor['name']
             pp_kwargs = pprocessor.get('inputs', {})
 
-            loaded = self._get_processor(pp_name, **pp_kwargs)
+            loaded = self._get_processor(pp_name, key, **pp_kwargs)
 
             if loaded:
                 loaded_pprocessors.append(loaded)
@@ -59,15 +65,16 @@ class FacetExtractor(BaseExtractor):
         processor_name = processor['name']
         processor_inputs = processor.get('inputs', {})
 
-        return self._get_processor(processor_name, **processor_inputs)
+        return self._get_processor(processor_name, 'processors', **processor_inputs)
 
-    def _get_processor(self, name: str, **kwargs) -> BaseProcessor:
+    def _get_processor(self, name: str, group: str = 'processors', **kwargs) -> BaseProcessor:
         """
 
         :param name: Name of the requested processor
         :return: processor object
         """
-        return self.processors.get_processor(name, **kwargs)
+
+        return getattr(self, group).get_processor(name, **kwargs)
 
     @staticmethod
     def _generate_item_id(filepath, tags, description):
