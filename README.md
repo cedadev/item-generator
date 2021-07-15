@@ -1,3 +1,5 @@
+[![Test](https://github.com/cedadev/item-generator/actions/workflows/tests.yml/badge.svg)](https://github.com/cedadev/item-generator/actions/workflows/tests.yml)
+
 # Item Generator
 
 Package to process files, extract facets and generate an item identifier
