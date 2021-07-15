@@ -59,7 +59,7 @@ class FacetMapProcessor(BasePostProcessor):
 
         for k, v in source_dict.items():
 
-            new_key = term_map.get(k)
+            new_key = self.term_map.get(k)
             if new_key:
                 output[new_key] = v
             else:
