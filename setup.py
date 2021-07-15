@@ -27,10 +27,15 @@ setup(
             'LICENSE'
         ]
     },
+    test_suite='tests',
     install_requires=[
         'asset_scanner',
         'directory_tree',
         'python-dateutil'
+    ],
+    tests_require=[
+        'pytest',
+        'tox'
     ],
     extras_require={
         'docs': [
@@ -38,6 +43,9 @@ setup(
             'sphinx-rtd-theme',
             'sphinx_fontawesome',
             'sphinxcontrib-programoutput'
+        ],
+        'dev': [
+            'isort'
         ]
     },
     entry_points={

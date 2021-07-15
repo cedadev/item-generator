@@ -11,16 +11,19 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-# Package imports
-from item_generator.core.decorators import accepts_postprocessors, accepts_preprocessors
+import logging
+import os
+# Python imports
+import re
+
 from asset_scanner.core.processor import BaseProcessor
+
+# Package imports
+from item_generator.core.decorators import (accepts_postprocessors,
+                                            accepts_preprocessors)
 
 # 3rd Party imports
 
-# Python imports
-import re
-import os
-import logging
 
 LOGGER = logging.getLogger(__name__)
 
