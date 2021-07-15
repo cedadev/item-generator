@@ -13,6 +13,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 # Package imports
 from item_generator.core.decorators import accepts_postprocessors, accepts_preprocessors
+from .mixins import PropertiesOutputKeyMixin
 from asset_scanner.core.processor import BaseProcessor
 
 # 3rd Party imports
@@ -25,7 +26,7 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-class RegexExtract(BaseProcessor):
+class RegexExtract(PropertiesOutputKeyMixin, BaseProcessor):
     """
 
     .. list-table::
@@ -46,6 +47,11 @@ class RegexExtract(BaseProcessor):
         - ``regex``: The regular expression to match against the filepath
         - ``pre_processors``: List of pre-processors to apply
         - ``post_processors``: List of post_processors to apply
+        - ``output_key``: When the metadata is returned, this key determines
+          where the metadata is fit in the response. Dot separated
+          strings can be used to created nested attributes.
+          ``default: 'properties'``
+
 
     Example configuration:
         .. code-block:: yaml

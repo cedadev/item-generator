@@ -10,7 +10,10 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import pkg_resources as pkg
 from asset_scanner.core.processor import BaseProcessor
+
 from item_generator.core.decorators import accepts_postprocessors
+from item_generator.extraction_methods.mixins import PropertiesOutputKeyMixin
+
 from typing import List
 
 import logging
@@ -18,7 +21,7 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-class HeaderExtract(BaseProcessor):
+class HeaderExtract(PropertiesOutputKeyMixin, BaseProcessor):
     """
 
     .. list-table::
@@ -38,6 +41,10 @@ class HeaderExtract(BaseProcessor):
     Configuration Options:
         - ``attributes``: A list of attributes to match agains the filePath
         - ``post_processors``: List of post_processors to apply
+        - ``output_key``: When the metadata is returned, this key determines
+          where the metadata is fit in the response. Dot separated
+          strings can be used to created nested attributes.
+          ``default: 'properties'``
 
     Example configuration:
         .. code-block:: yaml

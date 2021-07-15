@@ -222,8 +222,17 @@ processor.  Uses the key <code class="docutils literal notranslate"><span class=
 <dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">item_generator.core.facet_extractor.</span></span><span class="sig-name descname"><span class="pre">FacetExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py method">
-<dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor.get_facets">
-<span class="sig-name descname"><span class="pre">get_facets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">asset_scanner.core.item_describer.ItemDescription</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_media</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'POSIX'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor.get_facets" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor.process_file">
+<span class="sig-name descname"><span class="pre">process_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_media</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor.process_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to outline the processing pipeline for an individual file
+:param filepath:
+:param source_media:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor.run_processors">
+<span class="sig-name descname"><span class="pre">run_processors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">asset_scanner.core.item_describer.ItemDescription</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_media</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'POSIX'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor.run_processors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the raw facets from the file based on the listed processors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -237,15 +246,6 @@ processor.  Uses the key <code class="docutils literal notranslate"><span class=
 <dd class="field-even"><p>result from the processing</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="item_generator.core.facet_extractor.FacetExtractor.process_file">
-<span class="sig-name descname"><span class="pre">process_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_media</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#item_generator.core.facet_extractor.FacetExtractor.process_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to outline the processing pipeline for an individual file
-:param filepath:
-:param source_media:
-:return:</p>
 </dd></dl>
 
 </dd></dl>

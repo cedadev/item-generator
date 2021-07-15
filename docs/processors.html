@@ -236,6 +236,12 @@ file header.</p>
 <dt>Configuration Options:</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">attributes</span></code>: A list of attributes to match agains the filePath</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">post_processors</span></code>: List of post_processors to apply</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">output_key</span></code>: When the metadata is returned, this key determines</dt><dd><p>where the metadata is fit in the response.
+<code class="docutils literal notranslate"><span class="pre">default</span></code>: ‘properties’</p>
+</dd>
+</dl>
+</li>
 </ul>
 </dd>
 <dt>Example configuration:</dt><dd><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">header_extract</span>
@@ -281,6 +287,10 @@ extracted using the named capture groups.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">regex</span></code>: The regular expression to match against the filepath</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pre_processors</span></code>: List of pre-processors to apply</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">post_processors</span></code>: List of post_processors to apply</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_key</span></code>: When the metadata is returned, this key determines
+where the metadata is fit in the response. Dot separated
+strings can be used to created nested attributes.
+<code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">'properties'</span></code></p></li>
 </ul>
 </dd>
 <dt>Example configuration:</dt><dd><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">regex</span>
