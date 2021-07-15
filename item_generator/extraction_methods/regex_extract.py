@@ -11,9 +11,10 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
+
+# Python imports
 import logging
 import os
-# Python imports
 import re
 
 from asset_scanner.core.processor import BaseProcessor
@@ -21,14 +22,13 @@ from asset_scanner.core.processor import BaseProcessor
 # Package imports
 from item_generator.core.decorators import (accepts_postprocessors,
                                             accepts_preprocessors)
-
-# 3rd Party imports
+from .mixins import PropertiesOutputKeyMixin
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-class RegexExtract(BaseProcessor):
+class RegexExtract(PropertiesOutputKeyMixin, BaseProcessor):
     """
 
     .. list-table::
@@ -49,6 +49,11 @@ class RegexExtract(BaseProcessor):
         - ``regex``: The regular expression to match against the filepath
         - ``pre_processors``: List of pre-processors to apply
         - ``post_processors``: List of post_processors to apply
+        - ``output_key``: When the metadata is returned, this key determines
+          where the metadata is fit in the response. Dot separated
+          strings can be used to created nested attributes.
+          ``default: 'properties'``
+
 
     Example configuration:
         .. code-block:: yaml

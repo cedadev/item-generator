@@ -22,7 +22,7 @@ import logging
 from asset_scanner.core import BaseExtractor
 from asset_scanner.core.item_describer import ItemDescription, ItemDescriptions
 from asset_scanner.core.processor import BaseProcessor
-from asset_scanner.core.utils import dict_merge, generate_id
+from asset_scanner.core.utils import dict_merge, dot2dict, generate_id
 
 LOGGER = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ class FacetExtractor(BaseExtractor):
 
         return generate_id(filepath)
 
-    def get_facets(self, filepath: str, description: ItemDescription, source_media: str = 'POSIX', ) -> dict:
+    def run_processors(self, filepath: str, description: ItemDescription, source_media: str = 'POSIX', ) -> dict:
         """
         Extract the raw facets from the file based on the listed processors
 
@@ -116,9 +116,12 @@ class FacetExtractor(BaseExtractor):
             pre_processors = self._load_extra_processors(processor, 'pre_processors')
             post_processors = self._load_extra_processors(processor, 'post_processors')
 
-
             # Retrieve the metadata
             metadata = p.run(filepath, source_media=source_media, post_processors=post_processors, pre_processors=pre_processors)
+
+            output_key = p.get('output_key')
+            if output_key:
+                metadata = dot2dict(output_key, metadata)
 
             # Merge the extracted metadata with the metadata already retrieved
             tags = dict_merge(tags, metadata)
@@ -146,23 +149,24 @@ class FacetExtractor(BaseExtractor):
 
         # Get dataset description file
         description = self.item_descriptions.get_description(filepath)
-        
+
         # TODO: This section should return a dict for merging. Allows processors to add
         # metadata outside the properties section. Can use the dict merge function for
         # deep dictionary merging.
-        tags = self.get_facets(filepath, description, source_media)
+        processor_output = self.run_processors(filepath, description, source_media)
 
         # Generate item id
         id = self._generate_item_id(filepath, tags, description)
 
-        output = {
+        base_item_dict = {
             'id': id,
             'body': {
                 'item_id': id,
-                'type': 'item',
-                'properties': tags
+                'type': 'item'
             }
         }
+
+        output = dict_merge(base_item_dict, processor_output)
 
         # Output the item
         self.output(output, namespace='facets')
@@ -174,4 +178,5 @@ class FacetExtractor(BaseExtractor):
                 'collection_id': id
             }
         }
+
         self.output(output, namespace='assets')
