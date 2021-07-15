@@ -18,3 +18,21 @@ def is_remote_uri(path: str) -> bool:
     supported in <=v0.16.2.
     """
     return bool(re.search(r"^[a-z][a-z0-9]*(\://|\:\:)", path))
+
+
+def generate_item_id(filepath, tags, description):
+
+    has_all_facets = all([facet in tags for facet in description.aggregation_facets])
+
+    if has_all_facets:
+        id_string = ''
+        for facet in description.aggregation_facets:
+            vals = tags.get(facet)
+            if isinstance(vals, (str, int)):
+                id_string = '.'.join((id_string, vals))
+            if isinstance(vals, (list)):
+                id_string = '.'.join((id_string, f'multi_{facet}'))
+
+        return generate_id(id_string)
+
+    return generate_id(filepath)

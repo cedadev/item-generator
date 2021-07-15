@@ -68,6 +68,7 @@ setup(
         ],
         'item_generator.post_processors': [
             'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
+            'facet_map = item_generator.extraction_methods.postprocessors:FacetMapProcessor'
         ]
     }
 )

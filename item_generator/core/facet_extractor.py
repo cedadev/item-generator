@@ -24,6 +24,8 @@ from asset_scanner.core.item_describer import ItemDescription, ItemDescriptions
 from asset_scanner.core.processor import BaseProcessor
 from asset_scanner.core.utils import dict_merge, dot2dict, generate_id
 
+from item_generator.extraction_methods import utils as item_utils
+
 LOGGER = logging.getLogger(__name__)
 
 from typing import List
@@ -75,24 +77,6 @@ class FacetExtractor(BaseExtractor):
         """
 
         return getattr(self, group).get_processor(name, **kwargs)
-
-    @staticmethod
-    def _generate_item_id(filepath, tags, description):
-
-        has_all_facets = all([facet in tags for facet in description.aggregation_facets])
-
-        if has_all_facets:
-            id_string = ''
-            for facet in description.aggregation_facets:
-                vals = tags.get(facet)
-                if isinstance(vals, (str, int)):
-                    id_string = '.'.join((id_string, vals))
-                if isinstance(vals, (list)):
-                    id_string = '.'.join((id_string, f'multi_{facet}'))
-
-            return generate_id(id_string)
-
-        return generate_id(filepath)
 
     def run_processors(self, filepath: str, description: ItemDescription, source_media: str = 'POSIX', ) -> dict:
         """
@@ -150,13 +134,10 @@ class FacetExtractor(BaseExtractor):
         # Get dataset description file
         description = self.item_descriptions.get_description(filepath)
 
-        # TODO: This section should return a dict for merging. Allows processors to add
-        # metadata outside the properties section. Can use the dict merge function for
-        # deep dictionary merging.
         processor_output = self.run_processors(filepath, description, source_media)
 
         # Generate item id
-        id = self._generate_item_id(filepath, tags, description)
+        id = item_utils.generate_item_id(filepath, tags, description)
 
         base_item_dict = {
             'id': id,
@@ -166,6 +147,7 @@ class FacetExtractor(BaseExtractor):
             }
         }
 
+        # Merge processor output with base defaults
         output = dict_merge(base_item_dict, processor_output)
 
         # Output the item
