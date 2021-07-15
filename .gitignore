@@ -8,3 +8,4 @@ __pycache__
 .DS_Store
 docs_src/build
 .eggs
+.pytest_cache
