@@ -10,17 +10,14 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-# Package imports
-from asset_scanner.core.processor import BaseProcessor
-
-# 3rd Party imports
-from dateutil.parser import parse
-from dateutil.parser import ParserError
-
+import logging
 # Python imports
 from abc import abstractmethod
 
-import logging
+# Package imports
+from asset_scanner.core.processor import BaseProcessor
+# 3rd Party imports
+from dateutil.parser import ParserError, parse
 
 LOGGER = logging.getLogger(__name__)
 

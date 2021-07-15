@@ -17,16 +17,16 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from asset_scanner.core import BaseExtractor
-from asset_scanner.core.utils import dict_merge, generate_id, dot2dict
-from asset_scanner.core.processor import BaseProcessor
-from asset_scanner.core.item_describer import ItemDescriptions, ItemDescription
-
 import logging
+
+from asset_scanner.core import BaseExtractor
+from asset_scanner.core.item_describer import ItemDescription, ItemDescriptions
+from asset_scanner.core.processor import BaseProcessor
+from asset_scanner.core.utils import dict_merge, dot2dict, generate_id
 
 LOGGER = logging.getLogger(__name__)
 
-from typing import List, Callable
+from typing import Callable, List
 
 
 class FacetExtractor(BaseExtractor):

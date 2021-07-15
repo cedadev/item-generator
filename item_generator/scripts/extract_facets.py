@@ -24,10 +24,11 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import argparse
-import yaml
-from item_generator import FacetExtractor
-
 import logging
+
+import yaml
+
+from item_generator import FacetExtractor
 
 
 def cmd_arguments():

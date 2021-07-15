@@ -8,15 +8,14 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
+import logging
+from typing import List
+
 import pkg_resources as pkg
 from asset_scanner.core.processor import BaseProcessor
 
 from item_generator.core.decorators import accepts_postprocessors
 from item_generator.extraction_methods.mixins import PropertiesOutputKeyMixin
-
-from typing import List
-
-import logging
 
 LOGGER = logging.getLogger(__name__)
 

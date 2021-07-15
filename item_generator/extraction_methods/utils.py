@@ -9,8 +9,8 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import re
-
 from typing import Any
+
 
 def is_remote_uri(path: str) -> bool:
     """Finds URLs of the form protocol:// or protocol::
