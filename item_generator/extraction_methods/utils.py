@@ -11,6 +11,8 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import re
 from typing import Any
 
+from asset_scanner.core.utils import generate_id
+
 
 def is_remote_uri(path: str) -> bool:
     """Finds URLs of the form protocol:// or protocol::
@@ -20,7 +22,7 @@ def is_remote_uri(path: str) -> bool:
     return bool(re.search(r"^[a-z][a-z0-9]*(\://|\:\:)", path))
 
 
-def generate_item_id(filepath, tags, description):
+def generate_item_id_from_properties(filepath, tags, description):
 
     has_all_facets = all([facet in tags for facet in description.aggregation_facets])
 

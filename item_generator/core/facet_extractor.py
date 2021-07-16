@@ -101,9 +101,10 @@ class FacetExtractor(BaseExtractor):
             post_processors = self._load_extra_processors(processor, 'post_processors')
 
             # Retrieve the metadata
-            metadata = p.run(filepath, source_media=source_media, post_processors=post_processors, pre_processors=pre_processors)
+            metadata = p.run(filepath, source_media=source_media, post_processors=post_processors,
+                             pre_processors=pre_processors)
 
-            output_key = p.get('output_key')
+            output_key = getattr(p, 'output_key', None)
             if output_key:
                 metadata = dot2dict(output_key, metadata)
 
@@ -137,7 +138,11 @@ class FacetExtractor(BaseExtractor):
         processor_output = self.run_processors(filepath, description, source_media)
 
         # Generate item id
-        id = item_utils.generate_item_id(filepath, tags, description)
+        id = item_utils.generate_item_id_from_properties(
+            filepath,
+            processor_output.get('properties', {}),
+            description
+        )
 
         base_item_dict = {
             'id': id,
