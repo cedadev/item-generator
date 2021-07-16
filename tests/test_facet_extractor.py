@@ -9,6 +9,9 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import pytest
+import os
+from unittest import TestCase
+import ast
 
 from item_generator import FacetExtractor
 
@@ -28,11 +31,18 @@ POST_PROCESSORS = [
 
 
 @pytest.fixture
-def extractor_conf(tmp_path):
+def data_path():
+    mod_path = os.path.realpath(__file__)
+    test_path = os.path.dirname(mod_path)
+    return os.path.join(test_path, 'data')
+
+
+@pytest.fixture
+def extractor_conf(data_path):
     return {
         "extractor": "item_generator.FacetExtractor",
         "item_descriptions": {
-            "root_directory": tmp_path
+            "root_directory": os.path.join(data_path, 'descriptions'),
         },
         "inputs": [
             {
@@ -107,3 +117,55 @@ def test__load_extra_processors(extractor):
     ps = extractor._load_extra_processors(processor, 'post_processors')
     assert len(ps) == 1
     assert ps[0].__class__.__name__ == 'ISODateProcessor'
+
+
+def test_run_processors(extractor):
+    """
+    Check run_processors method for errors
+    """
+    path = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
+    description = extractor.item_descriptions.get_description(path)
+    expected = {'properties': {'datetime': '2005-01-05T00:00:00', 'platform': 'faam', 'flight_number': 'b069'}}
+
+    output = extractor.run_processors(
+        path,
+        description
+    )
+
+    assert output == expected
+
+
+def test_process_file(extractor, capsys):
+    """
+    Check the process_file method. As this method does not return a value,
+    need to capture the stdout and test against that.
+    """
+    path = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
+    expected_facet = {
+        'id': 'e51bff4c0c383366fcb422983f5b1de3',
+        'body': {
+            'item_id': 'e51bff4c0c383366fcb422983f5b1de3',
+            'type': 'item',
+            'properties': {
+                'datetime': '2005-01-05T00:00:00',
+                'platform': 'faam',
+                'flight_number': 'b069'
+            }
+        }
+    }
+
+    expected_asset = {'id': '3b65eee251f13679d90ca569061dd407',
+                      'body': {'collection_id': 'e51bff4c0c383366fcb422983f5b1de3'}}
+
+    extractor.process_file(path, 'POSIX')
+
+    # Parse the stdout to retrive the output
+    captured = capsys.readouterr()
+    facets, assets = captured.out.strip().split('\n')
+
+    # Can't use JSON.loads() as string in format "{'key':'value'}"
+    facets = ast.literal_eval(facets)
+    assets = ast.literal_eval(assets)
+
+    TestCase().assertDictEqual(expected_facet, facets)
+    TestCase().assertDictEqual(expected_asset, assets)

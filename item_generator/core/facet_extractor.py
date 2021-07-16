@@ -145,15 +145,17 @@ class FacetExtractor(BaseExtractor):
         )
 
         base_item_dict = {
-            'id': id,
-            'body': {
                 'item_id': id,
                 'type': 'item'
             }
-        }
 
         # Merge processor output with base defaults
-        output = dict_merge(base_item_dict, processor_output)
+        body = dict_merge(base_item_dict, processor_output)
+
+        output = {
+            'id': id,
+            'body': body
+        }
 
         # Output the item
         self.output(output, namespace='facets')

@@ -1,0 +1,23 @@
+datasets:
+  - /badc/faam/data
+facets:
+  allowed_facets:
+    - project
+    - flight_number
+    - datetime
+  extraction_methods:
+    - name: regex
+      inputs:
+        regex: '^(?:[^_]*_){2}(?P<datetime>\d*)'
+      pre_processors:
+        - name: filename_reducer
+      post_processors:
+        - name: isodate_processor
+          inputs:
+            date_key: datetime
+    - name: regex
+      inputs:
+        regex: '^\/(?:[^/]*/)(?P<platform>\w*)\/(?:[^/]*/){2}(?P<flight_number>\w\d{3})'
+  aggregation_facets:
+    - platform
+    - flight_number
