@@ -66,8 +66,8 @@ setup(
             'cf = item_generator.extraction_methods.header_extract.backends.cf:CfBackend'
         ],
         'item_generator.pre_processors': [
-            'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName'
-            'ceda_observaion = item_generator.extraction_methods.preprocessors:CEDAObservation'
+            'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName',
+            'ceda_observation = item_generator.extraction_methods.preprocessors:CEDAObservation'
         ],
         'item_generator.post_processors': [
             'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',

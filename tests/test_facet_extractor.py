@@ -17,11 +17,13 @@ from item_generator import FacetExtractor
 
 PROCESSORS = [
     'regex',
-    'header_extract'
+    'header_extract',
+    'iso19115'
 ]
 
 PRE_PROCESSORS = [
-    'filename_reducer'
+    'filename_reducer',
+    'ceda_observation'
 ]
 
 POST_PROCESSORS = [
@@ -125,6 +127,7 @@ def test_run_processors(extractor):
     """
     path = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
     description = extractor.item_descriptions.get_description(path)
+
     expected = {'properties': {'datetime': '2005-01-05T00:00:00', 'platform': 'faam', 'flight_number': 'b069'}}
 
     output = extractor.run_processors(
