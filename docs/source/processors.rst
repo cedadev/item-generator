@@ -21,6 +21,8 @@ the input arguments whilst post-processors modify the output from the main proce
       - Takes a filepath string and a list of attributes and returns a dictionary of the values extracted from the file header.
     * - :ref:`regex <regex>`
       - Takes an input string and a regex with named capture groups and returns a dictionary of the values extracted using the named capture groups.
+    * - :ref:`iso19115 <iso19115-extract>`
+      - Extracts attributes from an xml formatted ISO19115 record at a given URL. Supports URL templating.
 
 
 .. automodule:: item_generator.extraction_methods.header_extract
@@ -28,6 +30,9 @@ the input arguments whilst post-processors modify the output from the main proce
 .. autoclass:: item_generator.extraction_methods.header_extract.HeaderExtract
 
 .. automodule:: item_generator.extraction_methods.regex_extract
+    :members:
+
+.. automodule:: item_generator.extraction_methods.iso19115_extract
     :members:
 
 
@@ -45,6 +50,8 @@ Pre Processors
       - Description
     * - :ref:`filename_reducer <filename-reducer>`
       - Takes a file path and returns the filename using ``os.path.basename``.
+    * - :ref:`ceda_observation <ceda-observation>`
+      - Takes a file path and returns the uuid from the `CEDA Catalogue <http://catalogue.ceda.ac.uk/>`_.
 
 .. _filename-reducer:
 
@@ -52,6 +59,13 @@ Filename Reducer
 ----------------
 
 .. autoclass:: item_generator.extraction_methods.preprocessors.ReducePathtoName
+
+.. _ceda-observation:
+
+CEDA Observation
+----------------
+
+.. autoclass:: item_generator.extraction_methods.preprocessors.CEDAObservation
 
 
 

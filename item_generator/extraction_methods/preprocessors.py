@@ -14,6 +14,10 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import abc
 import logging
 import os
+from string import Template
+
+# Third party imports
+import requests
 
 # Package imports
 from asset_scanner.core.processor import BaseProcessor
@@ -53,3 +57,43 @@ class ReducePathtoName(BasePreProcessor):
 
         return (filepath, source_media), kwargs
 
+
+class CEDAObservation(BasePreProcessor):
+    """
+
+    Processor Name: ``ceda_observation``
+
+    Description:
+        Takes a file path and returns the ceda observation record.
+
+    Configuration Options:
+        - ``url_template``: The regular expression to match against the filepath.
+          Template uses the `python string template <https://docs.python.org/3/library/string.html#template-strings>`_ format.
+
+    Example Configuration:
+
+        .. code-block:: yaml
+
+              pre_processors:
+                - name: ceda_observation
+                  inputs:
+                    url_template: http://api.catalogue.ceda.ac.uk/api/v0/obs/get_info$filepath
+
+    """
+
+    def run(self, filepath: str, source_media: str = 'POSIX', **kwargs):
+
+        url = Template(self.url_template).substitute(filepath=filepath)
+
+        r = requests.get(url)
+
+        if r.status_code == 200:
+            response = r.json()
+            record_type = response.get('record_type')
+            url = response.get('url')
+
+            if record_type == 'Dataset' and url:
+                uuid = url.split('/')[-1]
+                kwargs['uuid'] = uuid
+
+        return (filepath, source_media), kwargs
