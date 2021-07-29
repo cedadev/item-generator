@@ -3,4 +3,5 @@ git+https://github.com/cedadev/directory-tree#egg=directory_tree
 git+https://github.com/cedadev/asset-scanner
 python-dateutil==2.8.1
 PyYAML==5.4.1
+requests==2.25.1
 six==1.16.0

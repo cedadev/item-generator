@@ -31,7 +31,8 @@ setup(
     install_requires=[
         'asset_scanner',
         'directory_tree',
-        'python-dateutil'
+        'python-dateutil',
+        'requests',
     ],
     tests_require=[
         'pytest',
@@ -57,7 +58,8 @@ setup(
         ],
         'item_generator.facet_extractors': [
             'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
-            'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract'
+            'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract',
+            'iso19115 = item_generator.extraction_methods.iso19115_extract:ISO19115Extract',
         ],
         'item_generator.facet_extractors.header_extract.backends': [
             'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',
@@ -65,6 +67,7 @@ setup(
         ],
         'item_generator.pre_processors': [
             'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName'
+            'ceda_observaion = item_generator.extraction_methods.preprocessors:CEDAObservation'
         ],
         'item_generator.post_processors': [
             'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
