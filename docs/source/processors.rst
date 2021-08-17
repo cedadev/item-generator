@@ -85,6 +85,9 @@ Post Processors
       - In some cases, you may wish to map the header attributes to different facets. This method takes a map and converts the facet labels into those specified.
     * - :ref:`isodate_processor <isodate-processor>`
       - Takes the source dict and the key to access the date and converts the date to ISO 8601 Format.
+    * - :ref:`stac_bbox <stac-bbox>`
+      - Converts coordinates from a dictionary into `RFC 7946, section 5 <https://tools.ietf.org/html/rfc7946#section-5>`_
+        formatted coordinates
 
 .. _facet-map:
 
@@ -98,3 +101,9 @@ Facet Map Processor
 ISO Date Processor
 -------------------
 .. autoclass:: item_generator.extraction_methods.postprocessors.ISODateProcessor
+
+.. _stac-bbox:
+
+STAC BBOX Processor
+-------------------
+.. autoclass:: item_generator.extraction_methods.postprocessors.BBOXProcessor

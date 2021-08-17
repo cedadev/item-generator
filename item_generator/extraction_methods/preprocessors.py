@@ -67,7 +67,7 @@ class CEDAObservation(BasePreProcessor):
         Takes a file path and returns the ceda observation record.
 
     Configuration Options:
-        - ``url_template``: The regular expression to match against the filepath.
+        - ``url_template``: ``REQUIRED`` URL string template to build url.
           Template uses the `python string template <https://docs.python.org/3/library/string.html#template-strings>`_ format.
 
     Example Configuration:

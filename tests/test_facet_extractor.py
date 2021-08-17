@@ -28,7 +28,8 @@ PRE_PROCESSORS = [
 
 POST_PROCESSORS = [
     'isodate_processor',
-    'facet_map'
+    'facet_map',
+    'stac_bbox'
 ]
 
 

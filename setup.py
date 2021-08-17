@@ -54,7 +54,7 @@ setup(
             'generate_items = item_generator.scripts.extract_facet:main',
         ],
         'asset_scanner.extractors': [
-          'item_generator = item_generator:FacetExtractor'
+          'item_generator = item_generator:FacetExtractor',
         ],
         'item_generator.facet_extractors': [
             'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
@@ -63,15 +63,17 @@ setup(
         ],
         'item_generator.facet_extractors.header_extract.backends': [
             'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',
-            'cf = item_generator.extraction_methods.header_extract.backends.cf:CfBackend'
+            'cf = item_generator.extraction_methods.header_extract.backends.cf:CfBackend',
         ],
         'item_generator.pre_processors': [
             'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName',
-            'ceda_observation = item_generator.extraction_methods.preprocessors:CEDAObservation'
+            'ceda_observation = item_generator.extraction_methods.preprocessors:CEDAObservation',
         ],
         'item_generator.post_processors': [
             'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
-            'facet_map = item_generator.extraction_methods.postprocessors:FacetMapProcessor'
+            'facet_map = item_generator.extraction_methods.postprocessors:FacetMapProcessor',
+            'stac_bbox = item_generator.extraction_methods.postprocessors:BBOXProcessor',
+            'string_join = item_generator.extraction_methods.postprocessors:StringJoinProcessor',
         ]
     }
 )

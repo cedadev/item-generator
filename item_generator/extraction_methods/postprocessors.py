@@ -125,3 +125,82 @@ class ISODateProcessor(BasePostProcessor):
             source_dict.pop(self.date_key, None)
 
         return source_dict
+
+
+class BBOXProcessor(BasePostProcessor):
+    """
+
+    Processor Name: ``stac_bbox``
+
+    Description:
+        Accepts a dictionary of coordinate values and converts to `RFC 7946, section 5 <https://tools.ietf.org/html/rfc7946#section-5>`_
+        formatted bbox.
+
+    Configuration Options:
+        ``key_list``: ``REQUIRED`` list of keys to convert to bbox array. Ordering is respected.
+
+    Example Configuration:
+
+    .. code-block:: yaml
+
+        post_processors:
+            - name: stac_bbox
+              inputs:
+                key_list:
+                   - west
+                   - south
+                   - east
+                   - north
+
+    """
+
+    def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
+
+        try:
+            rfc_bbox = [float(source_dict[key]) for key in self.key_list]
+            source_dict = rfc_bbox
+        except KeyError:
+            LOGGER.warning(f'Unable to convert bbox.', exc_info=True)
+
+        return source_dict
+
+
+class StringJoinProcessor(BasePostProcessor):
+    """
+
+    Processor Name: ``string_join``
+
+    Description:
+        Accepts a dictionary. String values are popped from the dictionary and
+        are put back into the dictionary with the ``output_key`` specified.
+
+    Configuration Options:
+        ``key_list``: ``REQUIRED`` list of keys to convert to bbox array. Ordering is respected.
+        ``delimiter``: ``REQUIRED`` text delimiter to put between strings
+        ``output_key``: ``REQUIRED`` name of the key you would like to output
+
+    Example Configuration:
+
+    .. code-block:: yaml
+
+        post_processors:
+            - name: string_join
+              inputs:
+                key_list:
+                   - year
+                   - month
+                   - day
+                delimiter: -
+                output_key: datetime
+
+    """
+
+    def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
+
+        try:
+            string_elements = [str(source_dict.pop(key)) for key in self.key_list]
+            source_dict[self.output_key] = self.delimiter.join(string_elements)
+        except KeyError:
+            LOGGER.warning(f'Unable merge strings. file: {filepath}', exc_info=True)
+
+        return source_dict
