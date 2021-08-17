@@ -63,17 +63,17 @@ def test_facet_map_processor(facet_map_processor, fpath, source_dict):
 
 def test_bbox_processor(bbox_processor, fpath):
     source_dict = {
-        'north': '42.231201171875',
-        'south': '38.5098876953125',
-        'east': '-28.706298828125',
-        'west': '-37.9745330810547'
+        'north': '42.0',
+        'south': '38.0',
+        'east': '-28.0',
+        'west': '-37.0'
     }
 
     expected = [
-        source_dict['west'],
-        source_dict['south'],
-        source_dict['east'],
-        source_dict['north']
+        float(source_dict['west']),
+        float(source_dict['south']),
+        float(source_dict['east']),
+        float(source_dict['north'])
     ]
 
     output = bbox_processor.run(fpath, source_dict=source_dict)
