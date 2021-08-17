@@ -59,7 +59,7 @@ class ISO19115Extract(PropertiesOutputKeyMixin, BaseProcessor):
         which are passed to the URL template.
 
     Configuration Options:
-        - ``url_template``: The regular expression to match against the filepath.
+        - ``url_template``: ``REQUIRED`` String template to build the URL.
           Template uses the `python string template <https://docs.python.org/3/library/string.html#template-strings>`_ format.
         - ``extraction_keys``: List of keys to retrieve from the response.
         - ``pre_processors``: List of pre-processors to apply

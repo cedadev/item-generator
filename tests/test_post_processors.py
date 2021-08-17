@@ -35,6 +35,11 @@ def facet_map_processor():
     return postprocessors.FacetMapProcessor(term_map={'date': 'start_date'})
 
 
+@pytest.fixture
+def bbox_processor():
+    return postprocessors.BBOXProcessor(key_list=['west', 'south', 'east', 'north'])
+
+
 def test_isodate_processor(isodate_processor, fpath, source_dict):
     """Check isodate processor does what's expected"""
     expected = source_dict.copy()
@@ -53,4 +58,23 @@ def test_facet_map_processor(facet_map_processor, fpath, source_dict):
     }
 
     output = facet_map_processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_bbox_processor(bbox_processor, fpath):
+    source_dict = {
+        'north': '42.0',
+        'south': '38.0',
+        'east': '-28.0',
+        'west': '-37.0'
+    }
+
+    expected = [
+        float(source_dict['west']),
+        float(source_dict['south']),
+        float(source_dict['east']),
+        float(source_dict['north'])
+    ]
+
+    output = bbox_processor.run(fpath, source_dict=source_dict)
     assert output == expected
