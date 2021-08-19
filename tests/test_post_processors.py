@@ -27,7 +27,7 @@ def source_dict():
 
 @pytest.fixture
 def isodate_processor():
-    return postprocessors.ISODateProcessor(date_key='date')
+    return postprocessors.ISODateProcessor(date_keys=['date'])
 
 
 @pytest.fixture

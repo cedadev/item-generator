@@ -14,7 +14,8 @@ facets:
       post_processors:
         - name: isodate_processor
           inputs:
-            date_key: datetime
+            date_keys:
+              - datetime
     - name: regex
       inputs:
         regex: '^\/(?:[^/]*/)(?P<platform>\w*)\/(?:[^/]*/){2}(?P<flight_number>\w\d{3})'

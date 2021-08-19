@@ -112,7 +112,7 @@ def test__load_extra_processors(extractor):
         'post_processors': [
             {
                 'name': 'isodate_processor',
-                'date_key': 'date'
+                'date_keys': ['date']
             }
         ]
     }
