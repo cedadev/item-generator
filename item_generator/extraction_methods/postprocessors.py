@@ -56,14 +56,15 @@ class FacetMapProcessor(BasePostProcessor):
 
     def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
         output = {}
+        if source_dict:
 
-        for k, v in source_dict.items():
+            for k, v in source_dict.items():
 
-            new_key = self.term_map.get(k)
-            if new_key:
-                output[new_key] = v
-            else:
-                output[k] = v
+                new_key = self.term_map.get(k)
+                if new_key:
+                    output[new_key] = v
+                else:
+                    output[k] = v
 
         return output
 
@@ -88,7 +89,8 @@ class ISODateProcessor(BasePostProcessor):
         an error logged.
 
     Configuration Options:
-        ``date_key``: name of the key to the date value
+        ``date_keys``: List of keys to the date value. Using a list allows
+        processing of multiple dates.
 
     Example Configuration:
 
@@ -97,7 +99,8 @@ class ISODateProcessor(BasePostProcessor):
             post_processors:
                 - name: isodate_processor
                   inputs:
-                    date_key: time
+                    date_key:
+                      - time
 
     """
 
@@ -109,20 +112,24 @@ class ISODateProcessor(BasePostProcessor):
 
         :return: the source dict with the date converted to ISO8601 format.
         """
-        if source_dict.get(self.date_key):
-            date = source_dict[self.date_key]
 
-            try:
-                date = parse(date).isoformat()
-                source_dict[self.date_key] = date
-            except ValueError as e:
-                LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
+        if source_dict:
 
-                # remove the bad date from the dict
-                source_dict.pop(self.date_key)
-        else:
-            # Clean up empty strings and non-matches
-            source_dict.pop(self.date_key, None)
+            for key in self.date_keys:
+                if source_dict.get(key):
+                    date = source_dict[key]
+
+                    try:
+                        date = parse(date).isoformat()
+                        source_dict[key] = date
+                    except ValueError as e:
+                        LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
+
+                        # remove the bad date from the dict
+                        source_dict.pop(key)
+                else:
+                    # Clean up empty strings and non-matches
+                    source_dict.pop(key, None)
 
         return source_dict
 
@@ -156,11 +163,13 @@ class BBOXProcessor(BasePostProcessor):
 
     def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
 
-        try:
-            rfc_bbox = [float(source_dict[key]) for key in self.key_list]
-            source_dict = rfc_bbox
-        except KeyError:
-            LOGGER.warning(f'Unable to convert bbox.', exc_info=True)
+        if source_dict:
+
+            try:
+                rfc_bbox = [float(source_dict[key]) for key in self.key_list]
+                source_dict = rfc_bbox
+            except KeyError:
+                LOGGER.warning(f'Unable to convert bbox.', exc_info=True)
 
         return source_dict
 
@@ -196,11 +205,12 @@ class StringJoinProcessor(BasePostProcessor):
     """
 
     def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
+        if source_dict:
 
-        try:
-            string_elements = [str(source_dict.pop(key)) for key in self.key_list]
-            source_dict[self.output_key] = self.delimiter.join(string_elements)
-        except KeyError:
-            LOGGER.warning(f'Unable merge strings. file: {filepath}', exc_info=True)
+            try:
+                string_elements = [str(source_dict.pop(key)) for key in self.key_list]
+                source_dict[self.output_key] = self.delimiter.join(string_elements)
+            except KeyError:
+                LOGGER.warning(f'Unable merge strings. file: {filepath}', exc_info=True)
 
         return source_dict

@@ -61,7 +61,7 @@ setup(
             'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract',
             'iso19115 = item_generator.extraction_methods.iso19115_extract:ISO19115Extract',
         ],
-        'item_generator.facet_extractors.header_extract.backends': [
+        'item_generator.extraction_methods.header_extract.backends': [
             'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',
             'cf = item_generator.extraction_methods.header_extract.backends.cf:CfBackend',
         ],

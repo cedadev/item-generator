@@ -66,8 +66,14 @@ class FacetExtractor(BaseExtractor):
     def _load_processor(self, processor: dict) -> BaseProcessor:
         processor_name = processor['name']
         processor_inputs = processor.get('inputs', {})
+        output_key = processor.get('output_key')
 
-        return self._get_processor(processor_name, 'processors', **processor_inputs)
+        return self._get_processor(
+            processor_name,
+            'processors',
+            output_key=output_key,
+            **processor_inputs
+        )
 
     def _get_processor(self, name: str, group: str = 'processors', **kwargs) -> BaseProcessor:
         """
@@ -105,11 +111,13 @@ class FacetExtractor(BaseExtractor):
                              pre_processors=pre_processors)
 
             output_key = getattr(p, 'output_key', None)
-            if output_key:
+
+            if output_key and metadata:
                 metadata = dot2dict(output_key, metadata)
 
             # Merge the extracted metadata with the metadata already retrieved
-            tags = dict_merge(tags, metadata)
+            if metadata:
+                tags = dict_merge(tags, metadata)
 
         # Process multi-values
 

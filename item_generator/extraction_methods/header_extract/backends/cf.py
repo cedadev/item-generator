@@ -25,7 +25,7 @@ class CfBackend:
         Takes an input string and returns a boolean on whether this
         backend can open that file.
     """
-    def guess_can_open(self, filepath: str, **kwargs) -> bool:
+    def guess_can_open(self, filepath: str) -> bool:
         try:
             file_type(filepath)
             return True

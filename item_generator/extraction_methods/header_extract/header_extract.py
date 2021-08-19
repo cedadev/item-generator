@@ -9,7 +9,8 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import logging
-from typing import List
+from typing import List, Dict
+from functools import lru_cache
 
 import pkg_resources as pkg
 from asset_scanner.core.processor import BaseProcessor
@@ -18,6 +19,11 @@ from item_generator.core.decorators import accepts_postprocessors
 from item_generator.extraction_methods.mixins import PropertiesOutputKeyMixin
 
 LOGGER = logging.getLogger(__name__)
+
+
+class NoSuitableBackendException(Exception):
+    """Returned when backend cannot be found for file"""
+    ...
 
 
 class HeaderExtract(PropertiesOutputKeyMixin, BaseProcessor):
@@ -58,16 +64,22 @@ class HeaderExtract(PropertiesOutputKeyMixin, BaseProcessor):
 
     """
     @accepts_postprocessors
-    def run(self, filepath: str, attributes: List, **kwargs) -> dict:
+    def run(self, filepath: str, source_media: str = 'POSIX', **kwargs) -> dict:
 
-        backend = self.guess_backend(filepath)
+        try:
+            backend = self.guess_backend(filepath)
+        except NoSuitableBackendException as e:
+            LOGGER.warning(f'Header extract backend not found for {filepath}')
+            return {}
 
         # Use the handler to extract the desired attributes from the header
-        data = self.attr_extraction(backend, filepath, attributes, **kwargs)
+        data = self.attr_extraction(backend, filepath, self.attributes)
 
         return data
-    
-    def list_backend(self):
+
+    @staticmethod
+    @lru_cache(maxsize=1)
+    def list_backend() -> Dict:
         backend_entrypoints = {}
         for pkg_ep in pkg.iter_entry_points("item_generator.extraction_methods.header_extract.backends"):
             name = pkg_ep.name
@@ -75,41 +87,33 @@ class HeaderExtract(PropertiesOutputKeyMixin, BaseProcessor):
                 backend = pkg_ep.load()
                 backend_entrypoints[name] = backend
             except Exception as ex:
-                LOGGER(ex)
+                LOGGER.warning(ex)
         return backend_entrypoints
     
-    def guess_backend(self, filepath: str, **kwargs) -> dict:
+    def guess_backend(self, filepath: str) -> Dict:
         backends = self.list_backend()
         for engine, backend in backends.items():
             backend = backend()
             if backend.guess_can_open(filepath):
                 return backend
         
-        raise(f"No backend found for file {filepath}")
-        
+        raise(NoSuitableBackendException(f"No backend found for file {filepath}"))
 
-
-    @accepts_postprocessors
+    @staticmethod
     def attr_extraction(
-            self,
             backend,
             file: str,
-            attributes: List,
-            argprocessors: List = ['posix_file'],
-            postprocessors: List = [],
-            **kwargs) -> dict:
+            attributes: List
+        ) -> dict:
         """
         Takes a filepath and list of attributes and extracts the metadata from the header.
 
         :param file: file-like object
         :param attributes: Header attributes to extract
-        :param argprocessors: list of processors to modify the arguments before being
-        put into this function
-        :param postprocessors: can be used to modify the output
         :param kwargs: kwargs to send to xarray.open_dataset(). e.g. engine to
         specify different engines to use with grib data.
 
         :return: Dictionary of extracted attributes
         """
 
-        return backend.attr_extraction(file, attributes, **kwargs)
+        return backend.attr_extraction(file, attributes)

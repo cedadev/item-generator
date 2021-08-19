@@ -25,7 +25,7 @@ class XarrayBackend:
         Takes an input string and returns a boolean on whether this
         backend can open that file.
     """
-    def guess_can_open(self, filepath: str, **kwargs) -> bool:
+    def guess_can_open(self, filepath: str) -> bool:
         try:
             self.engine = guess_engine(filepath)
             return True
