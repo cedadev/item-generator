@@ -23,6 +23,8 @@ the input arguments whilst post-processors modify the output from the main proce
       - Takes an input string and a regex with named capture groups and returns a dictionary of the values extracted using the named capture groups.
     * - :ref:`iso19115 <iso19115-extract>`
       - Extracts attributes from an xml formatted ISO19115 record at a given URL. Supports URL templating.
+    * - :ref:`xml_extract <xml-extract>`
+      - Extracts attributes from an xml formatted ISO19115 record at a given URL. Supports URL templating.
 
 
 .. automodule:: item_generator.extraction_methods.header_extract
@@ -33,6 +35,9 @@ the input arguments whilst post-processors modify the output from the main proce
     :members:
 
 .. automodule:: item_generator.extraction_methods.iso19115_extract
+    :members:
+
+.. automodule:: item_generator.extraction_methods.xml_extract
     :members:
 
 

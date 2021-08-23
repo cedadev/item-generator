@@ -60,6 +60,7 @@ setup(
             'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
             'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract',
             'iso19115 = item_generator.extraction_methods.iso19115_extract:ISO19115Extract',
+            'xml_extract = item_generator.extraction_methods.xml_extract:XMLExtract',
         ],
         'item_generator.extraction_methods.header_extract.backends': [
             'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',

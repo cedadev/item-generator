@@ -44,7 +44,7 @@ class HeaderExtract(PropertiesOutputKeyMixin, BaseProcessor):
         file header.
 
     Configuration Options:
-        - ``attributes``: A list of attributes to match agains the filePath
+        - ``attributes``: A list of attributes to match for from the file header
         - ``post_processors``: List of post_processors to apply
         - ``output_key``: When the metadata is returned, this key determines
           where the metadata is fit in the response. Dot separated
