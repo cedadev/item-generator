@@ -89,8 +89,8 @@ class ISODateProcessor(BasePostProcessor):
         an error logged.
 
     Configuration Options:
-        ``date_keys``: List of keys to the date value. Using a list allows
-        processing of multiple dates.
+        ``date_keys``: List of dictionaries containing the key to the date value and ``OPTIONAL`` The format the date is 
+        present in. Using a list allows processing of multiple dates.
 
     Example Configuration:
 
@@ -99,8 +99,9 @@ class ISODateProcessor(BasePostProcessor):
             post_processors:
                 - name: isodate_processor
                   inputs:
-                    date_key:
-                      - time
+                    date_keys:
+                      - key: date
+                        format: '%Y%m'
 
     """
 
@@ -112,24 +113,25 @@ class ISODateProcessor(BasePostProcessor):
 
         :return: the source dict with the date converted to ISO8601 format.
         """
-
         if source_dict:
 
-            for key in self.date_keys:
-                if source_dict.get(key):
-                    date = source_dict[key]
+            for d in self.date_keys:
+                if date := source_dict.get(d.key):
 
                     try:
-                        date = parse(date).isoformat()
-                        source_dict[key] = date
+                        if d.format:
+                            date = datetime.strptime(date, d.format).isoformat()
+                        else:
+                            date = parse(date).isoformat()
+                        source_dict[d.key] = date
                     except ValueError as e:
                         LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
 
                         # remove the bad date from the dict
-                        source_dict.pop(key)
+                        source_dict.pop(d.key)
                 else:
                     # Clean up empty strings and non-matches
-                    source_dict.pop(key, None)
+                    source_dict.pop(d.key, None)
 
         return source_dict
 
