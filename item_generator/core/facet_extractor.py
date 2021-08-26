@@ -97,6 +97,11 @@ class FacetExtractor(BaseExtractor):
         # Get default tags
         tags = description.defaults
 
+        # Get collection id
+        coll_id = description.collection.get('id')
+        if coll_id:
+            tags['collection_id'] = coll_id
+
         # Execute facet extraction functions
         processors = description.extraction_methods
 
