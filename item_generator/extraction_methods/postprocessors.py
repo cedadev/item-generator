@@ -13,6 +13,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import logging
 # Python imports
 from abc import abstractmethod
+from datetime import datetime
 
 # Package imports
 from asset_scanner.core.processor import BaseProcessor
@@ -89,8 +90,9 @@ class ISODateProcessor(BasePostProcessor):
         an error logged.
 
     Configuration Options:
-        ``date_keys``: List of keys to the date value. Using a list allows
-        processing of multiple dates.
+        ``date_keys``: `REQUIRED` List keys to the date value. Using a list allows processing of multiple dates.
+        ``format``: Optional format string. Default behaviour uses `dateutil.parser.parse<https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.parse>_`.
+        If a format string is suppled, this will change to use `datetime.datetime.strptime<https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime>_`.
 
     Example Configuration:
 
@@ -99,8 +101,9 @@ class ISODateProcessor(BasePostProcessor):
             post_processors:
                 - name: isodate_processor
                   inputs:
-                    date_key:
-                      - time
+                    date_keys:
+                      - key: date
+                    format: '%Y%m'
 
     """
 
@@ -112,7 +115,6 @@ class ISODateProcessor(BasePostProcessor):
 
         :return: the source dict with the date converted to ISO8601 format.
         """
-
         if source_dict:
 
             for key in self.date_keys:
@@ -120,7 +122,10 @@ class ISODateProcessor(BasePostProcessor):
                     date = source_dict[key]
 
                     try:
-                        date = parse(date).isoformat()
+                        if getattr(self, 'format', None):
+                            date = datetime.strptime(date, self.format).isoformat()
+                        else:
+                            date = parse(date).isoformat()
                         source_dict[key] = date
                     except ValueError as e:
                         LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
@@ -129,7 +134,7 @@ class ISODateProcessor(BasePostProcessor):
                         source_dict.pop(key)
                 else:
                     # Clean up empty strings and non-matches
-                    source_dict.pop(key, None)
+                    source_dict.pop(d.key, None)
 
         return source_dict
 
