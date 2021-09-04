@@ -55,21 +55,20 @@ Configuration takes the form a YAML formatted file.
 Sample configuration:
 ---------------------
 
-   .. code-block:: yaml
-
-      item_descriptions:
-        root_directory: /etc/item-generator/item_descriptions/descriptions
-      inputs:
-        - name: file_system
-          path: /badc/faam/data/2005/b069-jan-05
-      outputs:
-        - name: standard_out
+.. include:: shared/example_config.rst
 
 Configuration for the extraction pipelines is done separately. This could be stored in a different
 repository to manage versions and additions from multiple sources. You could then clone or download
 this repository and reference it using the ``item_descriptions.root_directory``.
 These pipeline files are in the form of `item description files <https://cedadev.github.io/asset-scanner/item_descriptions.html>`_.
 These YAML files specify the :ref:`processors <processors>` to use to extract your desired facets.
+
+.. note::
+   The item-generator outputs two things:
+   1. An item, including facets
+   2. An item ID to be applied to the asset.
+
+   These are separated using the namespace argument on the output plugin.
 
 
 Usage
@@ -89,6 +88,7 @@ Example:
    :maxdepth: 2
    :caption: User guide:
 
+   building_a_workflow
    processors
 
 .. toctree::
