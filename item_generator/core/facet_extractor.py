@@ -171,7 +171,7 @@ class FacetExtractor(BaseExtractor):
         }
 
         # Output the item
-        self.output(output, namespace='facets')
+        self.output(filepath, source_media, output, namespace='facets')
 
         # Add item id to asset
         output = {
@@ -181,4 +181,4 @@ class FacetExtractor(BaseExtractor):
             }
         }
 
-        self.output(output, namespace='assets')
+        self.output(filepath, source_media, output, namespace='assets')
