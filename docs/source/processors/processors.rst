@@ -1,5 +1,3 @@
-.. _processors:
-
 
 ******************
 Processors
@@ -11,6 +9,9 @@ are appended to and key:value pairs are overwritten by subsequent write operatio
 
 Some processors can also take :ref:`pre-processors` and :ref:`post-processors`. Pre-processors modify
 the input arguments whilst post-processors modify the output from the main processor.
+
+Core Processors
+================
 
 .. list-table::
     :header-rows: 1
@@ -40,6 +41,21 @@ the input arguments whilst post-processors modify the output from the main proce
 .. automodule:: item_generator.extraction_methods.xml_extract
     :members:
 
+Third-Party Processors
+-----------------------
+
+The plugin nature lends itself to third-party plugins. If you develop a plugin which might
+be useful for others' workflows. Please make a pull request to add it to this table.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Processor Name
+      - Description
+      - Vendor
+    * -
+      -
+      -
 
 .. _pre-processors:
 
@@ -73,6 +89,22 @@ CEDA Observation
 .. autoclass:: item_generator.extraction_methods.preprocessors.CEDAObservation
 
 
+Third-Party Pre-processors
+---------------------------
+
+The plugin nature lends itself to third-party plugins. If you develop a plugin which might
+be useful for others' workflows. Please make a pull request to add it to this table.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Processor Name
+      - Description
+      - Vendor
+    * -
+      -
+      -
+
 
 .. _post-processors:
 
@@ -86,29 +118,40 @@ Post Processors
 
     * - Processor Name
       - Description
-    * - :ref:`facet_map <facet-map>`
+    * - :ref:`facet_map <processors/processors:facet map processor>`
       - In some cases, you may wish to map the header attributes to different facets. This method takes a map and converts the facet labels into those specified.
-    * - :ref:`isodate_processor <isodate-processor>`
+    * - :ref:`isodate_processor <processors/processors:iso date processor>`
       - Takes the source dict and the key to access the date and converts the date to ISO 8601 Format.
-    * - :ref:`stac_bbox <stac-bbox>`
+    * - :ref:`stac_bbox <processors/processors:stac bbox processor>`
       - Converts coordinates from a dictionary into `RFC 7946, section 5 <https://tools.ietf.org/html/rfc7946#section-5>`_
         formatted coordinates
-
-.. _facet-map:
 
 Facet Map Processor
 -------------------
 
 .. autoclass:: item_generator.extraction_methods.postprocessors.FacetMapProcessor
 
-.. _isodate-processor:
-
 ISO Date Processor
 -------------------
 .. autoclass:: item_generator.extraction_methods.postprocessors.ISODateProcessor
 
-.. _stac-bbox:
-
 STAC BBOX Processor
 -------------------
 .. autoclass:: item_generator.extraction_methods.postprocessors.BBOXProcessor
+
+
+Third-Party Post-processors
+---------------------------
+
+The plugin nature lends itself to third-party plugins. If you develop a plugin which might
+be useful for others' workflows. Please make a pull request to add it to this table.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Processor Name
+      - Description
+      - Vendor
+    * -
+      -
+      -

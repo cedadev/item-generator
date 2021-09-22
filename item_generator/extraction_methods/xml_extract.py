@@ -3,7 +3,7 @@
 ..  _xml-extract:
 
 XML Extract
-------
+------------
 """
 __author__ = 'Richard Smith'
 __date__ = '19 Aug 2021'
