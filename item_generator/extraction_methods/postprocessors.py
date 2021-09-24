@@ -121,17 +121,40 @@ class ISODateProcessor(BasePostProcessor):
                 if source_dict.get(key):
                     date = source_dict[key]
 
+                    errors = False
+                    date_format = getattr(self, 'format', None)
+
                     try:
-                        if getattr(self, 'format', None):
+                        # If there is a specified format, try that. Else
+                        # use generic parser
+                        if date_format:
                             date = datetime.strptime(date, self.format).isoformat()
                         else:
                             date = parse(date).isoformat()
                         source_dict[key] = date
                     except ValueError as e:
-                        LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
 
-                        # remove the bad date from the dict
-                        source_dict.pop(key)
+                        if date_format:
+                            LOGGER.warning(f'Error parsing date from file: {filepath} with format: {self.format}.'
+                                           f'With error {e}. Trying dateutil...')
+                            errors = True
+                        else:
+                            LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
+
+                            # remove the bad date from the dict
+                            source_dict.pop(key)
+
+                    # Tried specific format but this failed. Try generic parser.
+                    if errors:
+                        try:
+                            date = parse(date).isoformat()
+                            source_dict[key] = date
+                        except ValueError as e:
+                            LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
+
+                            # remove the bad date from the dict
+                            source_dict.pop(key)
+
                 else:
                     # Clean up empty strings and non-matches
                     source_dict.pop(d.key, None)
