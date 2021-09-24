@@ -24,7 +24,6 @@ def source_dict():
         'date': '2021-05-02'
     }
 
-
 @pytest.fixture
 def isodate_processor():
     return postprocessors.ISODateProcessor(date_keys=['date'])
@@ -163,4 +162,77 @@ def test_bbox_processor(bbox_processor, fpath):
     ]
 
     output = bbox_processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_no_year(fpath, caplog):
+    """
+    Test that not providing a year results in an error logged
+    """
+    processor = postprocessors.DateCombinatorProcessor()
+
+    source_dict = {
+        'month': '02',
+        'day': '01'
+    }
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'ERROR'
+
+
+def test_date_combinator(fpath):
+    """
+    Test can join and produce correct string
+    """
+    processor = postprocessors.DateCombinatorProcessor()
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+        'day': '01'
+    }
+
+    expected = {}
+    expected['datetime'] = '1850-02-01'
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_non_destructive(fpath):
+    """
+    Test that data is preserved in non-destrictive mode
+    """
+    processor = postprocessors.DateCombinatorProcessor(destructive=False)
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+        'day': '01'
+    }
+
+    expected = source_dict.copy()
+    expected['datetime'] = '1850-02-01'
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_different_output_key(fpath):
+    """
+    Test can set different output key
+    """
+    processor = postprocessors.DateCombinatorProcessor(output_key='test')
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+        'day': '01'
+    }
+
+    expected = {}
+    expected['test'] = '1850-02-01'
+
+    output = processor.run(fpath, source_dict=source_dict)
     assert output == expected

@@ -282,6 +282,7 @@ class DateCombinatorProcessor(BasePostProcessor):
 
             if not source_dict.get('year'):
                 LOGGER.error(f'Unable to use date combinator for file: {filepath}. Requires at least "year"')
+                return source_dict
 
             # Template the date. safe_substitute allows missing and extra keys.
             date = DATE_TEMPLATE.safe_substitute(**source_dict)
@@ -293,7 +294,9 @@ class DateCombinatorProcessor(BasePostProcessor):
             except ValueError:
                 # $ not found in date string so fully templated
                 ...
-            source_dict[self.output_key] = date
+
+            output_key = getattr(self, 'output_key', 'datetime')
+            source_dict[output_key] = date
 
             # Clear out keys if destructive
             if getattr(self, 'destructive', True):
