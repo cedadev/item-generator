@@ -29,6 +29,9 @@ def source_dict():
 def isodate_processor():
     return postprocessors.ISODateProcessor(date_keys=['date'])
 
+@pytest.fixture
+def isodate_processor_with_format():
+    return postprocessors.ISODateProcessor(date_keys=['date'], format='%Y%m')
 
 @pytest.fixture
 def facet_map_processor():
@@ -47,6 +50,89 @@ def test_isodate_processor(isodate_processor, fpath, source_dict):
 
     output = isodate_processor.run(fpath, source_dict=source_dict)
     assert output == expected
+
+
+def test_isodate_processor_bad_date(isodate_processor, fpath, caplog):
+    """Check isodate processor does what's expected.date
+
+    Conditions:
+        - No format string
+        - Date string not parsable by dateutil
+
+    Expected:
+        - Produce an error
+        - Delete the date key
+    """
+    source_dict = {
+        'date': '202105'
+    }
+    expected = {}
+
+    output = isodate_processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'ERROR'
+
+
+def test_isodate_processor_with_good_format(isodate_processor_with_format, fpath):
+    """Check isodate processor.
+    Conditions:
+        - Format string does match date string
+        - Date string not parsable by dateutil
+
+    Expected:
+        - Successfully use strptime to parse the date
+    """
+
+    source_dict = {
+        'date': '202105'
+    }
+    expected = source_dict.copy()
+    expected['date'] = '2021-05-01T00:00:00'
+
+    output = isodate_processor_with_format.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_isodate_processor_with_bad_format(isodate_processor_with_format, fpath, caplog):
+    """Check isodate processor.
+    Conditions:
+        - Format string does not match date string
+        - Date string parsable by dateutil
+
+    Expected:
+        - Produce warning
+        - Successfully Use dateutil to parse the date
+    """
+    source_dict = {
+        'date': '20210501'
+    }
+    expected = source_dict.copy()
+    expected['date'] = '2021-05-01T00:00:00'
+
+    output = isodate_processor_with_format.run(fpath, source_dict=source_dict)
+    assert output == expected
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'WARNING'
+
+
+def test_isodate_processor_with_bad_format_bad_dateutil(isodate_processor_with_format, fpath, caplog):
+    """Check isodate processor.
+    Conditions:
+        - Format string does not match date string
+        - Date string ambiguous and nor parsable by dateutil
+
+    Expected:
+        Should delete the date
+    """
+    source_dict = {
+        'date': '2021010101'
+    }
+    expected = {}
+
+    output = isodate_processor_with_format.run(fpath, source_dict=source_dict)
+    assert output == expected
+    assert len(caplog.records) == 2
 
 
 def test_facet_map_processor(facet_map_processor, fpath, source_dict):
