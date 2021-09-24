@@ -17,7 +17,7 @@ from datetime import datetime
 
 # Package imports
 from asset_scanner.core.processor import BaseProcessor
-from asset_scanner.extraction_methods.utils import DATE_TEMPLATE
+from item_generator.extraction_methods.utils import DATE_TEMPLATE
 
 # 3rd Party imports
 from dateutil.parser import ParserError, parse
