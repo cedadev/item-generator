@@ -10,8 +10,12 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import re
 from typing import Any
+from string import Template
 
 from asset_scanner.core.utils import generate_id
+
+
+DATE_TEMPLATE = Template('${year}-${month}-${day}T${hour}:${minute}:${second}')
 
 
 def is_remote_uri(path: str) -> bool:

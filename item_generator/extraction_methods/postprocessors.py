@@ -17,6 +17,8 @@ from datetime import datetime
 
 # Package imports
 from asset_scanner.core.processor import BaseProcessor
+from asset_scanner.extraction_methods.utils import DATE_TEMPLATE
+
 # 3rd Party imports
 from dateutil.parser import ParserError, parse
 
@@ -240,5 +242,62 @@ class StringJoinProcessor(BasePostProcessor):
                 source_dict[self.output_key] = self.delimiter.join(string_elements)
             except KeyError:
                 LOGGER.warning(f'Unable merge strings. file: {filepath}', exc_info=True)
+
+        return source_dict
+
+
+class DateCombinatorProcessor(BasePostProcessor):
+    """
+
+    Processor Name: ``date_combinator``
+
+    Description:
+        Used to automatically join date components to create a date.
+        E.g.
+        - year (required)
+        - month
+        - day
+        - hour
+        - minutes
+        - seconds
+
+    Configuration Options:
+        ``destructive``: Whether the keys are removed from the output when combined. ``DEFAULT: true``
+        ``output_key``: Name of the key you would like to output. ``DEFAULT: datetime``
+
+    Example Configuration:
+
+    .. code-block:: yaml
+
+        post_processors:
+            - name: date_combinator
+              inputs:
+                destructive: true
+                output_key: datetime
+
+    """
+
+    def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
+        if source_dict:
+
+            if not source_dict.get('year'):
+                LOGGER.error(f'Unable to use date combinator for file: {filepath}. Requires at least "year"')
+
+            # Template the date. safe_substitute allows missing and extra keys.
+            date = DATE_TEMPLATE.safe_substitute(**source_dict)
+
+            # Trim the resulting string to remove un-filled template parameters
+            try:
+                trim_index = date.index('$')
+                date = date[0:trim_index-1]
+            except ValueError:
+                # $ not found in date string so fully templated
+                ...
+            source_dict[self.output_key] = date
+
+            # Clear out keys if destructive
+            if getattr(self, 'destructive', True):
+                for key in ['year', 'month', 'day', 'hour','minute','second']:
+                    source_dict.pop(key, None)
 
         return source_dict

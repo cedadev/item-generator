@@ -75,6 +75,7 @@ setup(
             'facet_map = item_generator.extraction_methods.postprocessors:FacetMapProcessor',
             'stac_bbox = item_generator.extraction_methods.postprocessors:BBOXProcessor',
             'string_join = item_generator.extraction_methods.postprocessors:StringJoinProcessor',
+            'date_combinator = item_generator.extraction_methods.postprocessors:DateCombinatorProcessor',
         ]
     }
 )
