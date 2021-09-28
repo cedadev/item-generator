@@ -23,6 +23,7 @@ from asset_scanner.core import BaseExtractor
 from asset_scanner.core.item_describer import ItemDescription, ItemDescriptions
 from asset_scanner.core.processor import BaseProcessor
 from asset_scanner.core.utils import dict_merge, dot2dict, generate_id
+from asset_scanner.types.source_media import StorageType
 
 from item_generator.extraction_methods import utils as item_utils
 
@@ -84,13 +85,17 @@ class FacetExtractor(BaseExtractor):
 
         return getattr(self, group).get_processor(name, **kwargs)
 
-    def run_processors(self, filepath: str, description: ItemDescription, source_media: str = 'POSIX', ) -> dict:
+    def run_processors(self,
+                       filepath: str,
+                       description: ItemDescription,
+                       source_media: StorageType = StorageType.POSIX,
+                       **kwargs: dict) -> dict:
         """
         Extract the raw facets from the file based on the listed processors
 
         :param filepath: Path to the file
+        :param description: ItemDescription
         :param source_media: The source media type (POSIX, Object, Tape)
-        :param processors: List of processing functions to call to extract the facets
 
         :return: result from the processing
         """
@@ -136,19 +141,21 @@ class FacetExtractor(BaseExtractor):
 
         return tags
 
-    def process_file(self, filepath, source_media):
+    def process_file(self, filepath, source_media, **kwargs):
         """
         Method to outline the processing pipeline for an individual file
         :param filepath:
         :param source_media:
         :return:
         """
+        filepath = self._get_path(filepath, **kwargs)
+
         LOGGER.info(f'Processing: {filepath}')
 
         # Get dataset description file
         description = self.item_descriptions.get_description(filepath)
 
-        processor_output = self.run_processors(filepath, description, source_media)
+        processor_output = self.run_processors(filepath, description, source_media, **kwargs)
 
         # Generate item id
         id = item_utils.generate_item_id_from_properties(
