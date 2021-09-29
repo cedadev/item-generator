@@ -123,7 +123,7 @@ Post Processors
     * - :ref:`isodate_processor <processors/processors:iso date processor>`
       - Takes the source dict and the key to access the date and converts the date to ISO 8601 Format.
     * - :ref:`date_combinator <processors/processors:date combinator processor>`
-      - Automatically converts year, month, day, hour, minunte, second keys into a date.
+      - Automatically converts year, month, day, hour, minunte, second keys into a ISO 8601 date.
     * - :ref:`stac_bbox <processors/processors:stac bbox processor>`
       - Converts coordinates from a dictionary into `RFC 7946, section 5 <https://tools.ietf.org/html/rfc7946#section-5>`_
         formatted coordinates
