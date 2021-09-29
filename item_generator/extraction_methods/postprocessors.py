@@ -43,7 +43,7 @@ class FacetMapProcessor(BasePostProcessor):
         specified.
 
     Configuration Options:
-        ``term_map``: Dictionary of terms to map
+        - ``term_map``: Dictionary of terms to map
 
     Example Configuration:
 
@@ -92,9 +92,9 @@ class ISODateProcessor(BasePostProcessor):
         an error logged.
 
     Configuration Options:
-        ``date_keys``: `REQUIRED` List keys to the date value. Using a list allows processing of multiple dates.
-        ``format``: Optional format string. Default behaviour uses `dateutil.parser.parse<https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.parse>_`.
-        If a format string is suppled, this will change to use `datetime.datetime.strptime<https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime>_`.
+        - ``date_keys``: `REQUIRED` List keys to the date value. Using a list allows processing of multiple dates.
+        - ``format``: Optional format string. Default behaviour uses `dateutil.parser.parse<https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.parse>_`.
+           If a format string is suppled, this will change to use `datetime.datetime.strptime<https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime>_`.
 
     Example Configuration:
 
@@ -153,7 +153,7 @@ class BBOXProcessor(BasePostProcessor):
         formatted bbox.
 
     Configuration Options:
-        ``key_list``: ``REQUIRED`` list of keys to convert to bbox array. Ordering is respected.
+        - ``key_list``: ``REQUIRED`` list of keys to convert to bbox array. Ordering is respected.
 
     Example Configuration:
 
@@ -193,9 +193,9 @@ class StringJoinProcessor(BasePostProcessor):
         are put back into the dictionary with the ``output_key`` specified.
 
     Configuration Options:
-        ``key_list``: ``REQUIRED`` list of keys to convert to bbox array. Ordering is respected.
-        ``delimiter``: ``REQUIRED`` text delimiter to put between strings
-        ``output_key``: ``REQUIRED`` name of the key you would like to output
+        - ``key_list``: ``REQUIRED`` list of keys to convert to bbox array. Ordering is respected.
+        - ``delimiter``: ``REQUIRED`` text delimiter to put between strings
+        - ``output_key``: ``REQUIRED`` name of the key you would like to output
 
     Example Configuration:
 
@@ -248,9 +248,10 @@ class DateCombinatorProcessor(BasePostProcessor):
             result in ``2021-03`` -> ``2021-03-01T00:00:00``.
 
     Configuration Options:
-        ``destructive``: Whether the keys are removed from the output when combined. ``DEFAULT: true``
-        ``output_key``: Name of the key you would like to output. ``DEFAULT: datetime``
-        ``format``: Format string to parse date to isodate. Date template is: ``${year}-${month}-${day}T${hour}:${minute}:${second}``
+        - ``destructive``: Whether the keys are removed from the output when combined. ``DEFAULT: true``
+        - ``output_key``: Name of the key you would like to output. ``DEFAULT: datetime``
+        - ``format``: Format string to parse date to isodate. Date template is: ``${year}-${month}-${day}T${hour}:${minute}:${second}``
+           The format string is passed to `datetime.datetime.strptime<https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime>_`
 
     Example Configuration:
 
