@@ -244,8 +244,8 @@ class DateCombinatorProcessor(BasePostProcessor):
 
             If you are only expecting to extract <year>-<month> make sure to include
             a format string. Dateutil.parser.parse will use the current day to fill the
-            blank rather than 01. e.g. 2021-03 -> 2021-03-29T00:00:00. Using format: %Y-%m will
-            result in 2021-03 -> 2021-03-01T00:00:00.
+            blank rather than 01. e.g. ``2021-03`` -> ``2021-03-29T00:00:00``. Using format: ``%Y-%m`` will
+            result in ``2021-03`` -> ``2021-03-01T00:00:00``.
 
     Configuration Options:
         ``destructive``: Whether the keys are removed from the output when combined. ``DEFAULT: true``
@@ -260,7 +260,7 @@ class DateCombinatorProcessor(BasePostProcessor):
             - name: date_combinator
               inputs:
                 destructive: true
-                format: '%Y-%m
+                format: '%Y-%m'
                 output_key: datetime
 
     """
