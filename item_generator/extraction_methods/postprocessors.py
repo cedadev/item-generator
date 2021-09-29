@@ -250,7 +250,7 @@ class DateCombinatorProcessor(BasePostProcessor):
     Configuration Options:
         ``destructive``: Whether the keys are removed from the output when combined. ``DEFAULT: true``
         ``output_key``: Name of the key you would like to output. ``DEFAULT: datetime``
-        ``format``: Format string to parse date to isodate. Date template is: ${year}-${month}-${day}T${hour}:${minute}:${second}
+        ``format``: Format string to parse date to isodate. Date template is: ``${year}-${month}-${day}T${hour}:${minute}:${second}``
 
     Example Configuration:
 
