@@ -17,6 +17,8 @@ from datetime import datetime
 
 # Package imports
 from asset_scanner.core.processor import BaseProcessor
+from item_generator.extraction_methods.utils import DATE_TEMPLATE, isoformat_date
+
 # 3rd Party imports
 from dateutil.parser import ParserError, parse
 
@@ -121,39 +123,18 @@ class ISODateProcessor(BasePostProcessor):
                 if source_dict.get(key):
                     date = source_dict[key]
 
-                    errors = False
                     date_format = getattr(self, 'format', None)
 
-                    try:
-                        # If there is a specified format, try that. Else
-                        # use generic parser
-                        if date_format:
-                            date = datetime.strptime(date, self.format).isoformat()
-                        else:
-                            date = parse(date).isoformat()
+                    date, format_errors = isoformat_date(date, date_format)
+
+                    if format_errors:
+                        LOGGER.warning(f'Could not use format string {date_format} with date from: {filepath}')
+
+                    if not date:
+                        LOGGER.error(f'Could not extract date from {filepath}')
+                        source_dict.pop(key)
+                    else:
                         source_dict[key] = date
-                    except ValueError as e:
-
-                        if date_format:
-                            LOGGER.warning(f'Error parsing date from file: {filepath} with format: {self.format}.'
-                                           f'With error {e}. Trying dateutil...')
-                            errors = True
-                        else:
-                            LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
-
-                            # remove the bad date from the dict
-                            source_dict.pop(key)
-
-                    # Tried specific format but this failed. Try generic parser.
-                    if errors:
-                        try:
-                            date = parse(date).isoformat()
-                            source_dict[key] = date
-                        except ValueError as e:
-                            LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
-
-                            # remove the bad date from the dict
-                            source_dict.pop(key)
 
                 else:
                     # Clean up empty strings and non-matches
@@ -240,5 +221,91 @@ class StringJoinProcessor(BasePostProcessor):
                 source_dict[self.output_key] = self.delimiter.join(string_elements)
             except KeyError:
                 LOGGER.warning(f'Unable merge strings. file: {filepath}', exc_info=True)
+
+        return source_dict
+
+
+class DateCombinatorProcessor(BasePostProcessor):
+    """
+
+    Processor Name: ``date_combinator``
+
+    Description:
+        Used to automatically join date components to create an ISO 8601 date.
+        E.g.
+        - year (required)
+        - month
+        - day
+        - hour
+        - minutes
+        - seconds
+
+        .. note::
+
+            If you are only expecting to extract <year>-<month> make sure to include
+            a format string. Dateutil.parser.parse will use the current day to fill the
+            blank rather than 01. e.g. 2021-03 -> 2021-03-29T00:00:00. Using format: %Y-%m will
+            result in 2021-03 -> 2021-03-01T00:00:00.
+
+    Configuration Options:
+        ``destructive``: Whether the keys are removed from the output when combined. ``DEFAULT: true``
+        ``output_key``: Name of the key you would like to output. ``DEFAULT: datetime``
+        ``format``: Format string to parse date to isodate. Date template is: ${year}-${month}-${day}T${hour}:${minute}:${second}
+
+    Example Configuration:
+
+    .. code-block:: yaml
+
+        post_processors:
+            - name: date_combinator
+              inputs:
+                destructive: true
+                format: '%Y-%m
+                output_key: datetime
+
+    """
+
+    def run(self, filepath: str, source_media: str = 'POSIX', source_dict: dict = {}, **kwargs ):
+        if source_dict:
+
+            if not source_dict.get('year'):
+                LOGGER.error(f'Unable to use date combinator for file: {filepath}. Requires at least "year"')
+                return source_dict
+
+            date_format = getattr(self, 'format', None)
+
+            if not all(k in source_dict for k in ['year', 'month', 'day']):
+                if not date_format:
+                    LOGGER.error(f'Dateutil does not perform as expected without a day. It will use the current day instead of 01.'
+                                 f'Make sure to use a format string if only providing %Y-%m')
+                    return source_dict
+
+            # Template the date. safe_substitute allows missing and extra keys.
+            date = DATE_TEMPLATE.safe_substitute(**source_dict)
+
+            # Trim the resulting string to remove un-filled template parameters
+            try:
+                trim_index = date.index('$')
+                date = date[0:trim_index-1]
+            except ValueError:
+                # $ not found in date string so fully templated
+                ...
+
+            # ISO8601 format the date
+            isodate, format_errors = isoformat_date(date, date_format)
+
+            if format_errors:
+                LOGGER.warning(f'Error parsing date from file: {filepath} with format: {self.format}.'
+                               f'With error {e}. Trying dateutil...')
+            if not isodate:
+                LOGGER.error(f'Error parsing date from file: {filepath} on media: {source_media} - {e}')
+
+            output_key = getattr(self, 'output_key', 'datetime')
+            source_dict[output_key] = isodate or date
+
+            # Clear out keys if destructive
+            if getattr(self, 'destructive', True):
+                for key in ['year', 'month', 'day', 'hour','minute','second']:
+                    source_dict.pop(key, None)
 
         return source_dict

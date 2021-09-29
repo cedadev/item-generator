@@ -24,7 +24,6 @@ def source_dict():
         'date': '2021-05-02'
     }
 
-
 @pytest.fixture
 def isodate_processor():
     return postprocessors.ISODateProcessor(date_keys=['date'])
@@ -70,7 +69,7 @@ def test_isodate_processor_bad_date(isodate_processor, fpath, caplog):
 
     output = isodate_processor.run(fpath, source_dict=source_dict)
     assert output == expected
-    assert len(caplog.records) == 1
+    assert len(caplog.records) == 2
     assert caplog.records[0].levelname == 'ERROR'
 
 
@@ -112,7 +111,7 @@ def test_isodate_processor_with_bad_format(isodate_processor_with_format, fpath,
 
     output = isodate_processor_with_format.run(fpath, source_dict=source_dict)
     assert output == expected
-    assert len(caplog.records) == 1
+    assert len(caplog.records) == 2
     assert caplog.records[0].levelname == 'WARNING'
 
 
@@ -132,7 +131,7 @@ def test_isodate_processor_with_bad_format_bad_dateutil(isodate_processor_with_f
 
     output = isodate_processor_with_format.run(fpath, source_dict=source_dict)
     assert output == expected
-    assert len(caplog.records) == 2
+    assert len(caplog.records) == 4
 
 
 def test_facet_map_processor(facet_map_processor, fpath, source_dict):
@@ -164,3 +163,136 @@ def test_bbox_processor(bbox_processor, fpath):
 
     output = bbox_processor.run(fpath, source_dict=source_dict)
     assert output == expected
+
+
+def test_date_combinator_no_year(fpath, caplog):
+    """
+    Test that not providing a year results in an error logged
+    """
+    processor = postprocessors.DateCombinatorProcessor()
+
+    source_dict = {
+        'month': '02',
+        'day': '01'
+    }
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'ERROR'
+
+
+def test_date_combinator(fpath):
+    """
+    Test can join and produce correct string
+    """
+    processor = postprocessors.DateCombinatorProcessor()
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+        'day': '01'
+    }
+
+    expected = {}
+    expected['datetime'] = '1850-02-01T00:00:00'
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_non_destructive(fpath):
+    """
+    Test that data is preserved in non-destrictive mode
+    """
+    processor = postprocessors.DateCombinatorProcessor(destructive=False)
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+        'day': '01'
+    }
+
+    expected = source_dict.copy()
+    expected['datetime'] = '1850-02-01T00:00:00'
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_different_output_key(fpath):
+    """
+    Test can set different output key
+    """
+    processor = postprocessors.DateCombinatorProcessor(output_key='test')
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+        'day': '01'
+    }
+
+    expected = {}
+    expected['test'] = '1850-02-01T00:00:00'
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_format_string(fpath):
+    """
+    Test can use format string
+    """
+    processor = postprocessors.DateCombinatorProcessor(format='%Y-%m')
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+    }
+
+    expected = {}
+    expected['datetime'] = '1850-02-01T00:00:00'
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_no_kwargs(fpath):
+    """Check that the processor can run with no kwargs."""
+    processor = postprocessors.DateCombinatorProcessor()
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+        'day': '01'
+    }
+
+    expected = {}
+    expected['datetime'] = '1850-02-01T00:00:00'
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+
+
+def test_date_combinator_ym_no_format(fpath, caplog):
+    """
+    Check that the processor logs an error
+    if only year and month are provided with
+    no format string.
+
+    Expected:
+        Should keep the original data
+        Should produce an error log
+    """
+
+    processor = postprocessors.DateCombinatorProcessor()
+
+    source_dict = {
+        'year': '1850',
+        'month': '02',
+    }
+
+    expected = source_dict.copy()
+
+    output = processor.run(fpath, source_dict=source_dict)
+    assert output == expected
+    assert len(caplog.records) == 1
