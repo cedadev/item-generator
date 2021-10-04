@@ -155,17 +155,26 @@ class FacetExtractor(BaseExtractor):
         # Get dataset description file
         description = self.item_descriptions.get_description(filepath)
 
+        # Do not run processors if the asset has been marked as hidden. This
+        # prevents files like .ftpaccess files from becoming STAC items
+        categories = self.get_categories(filepath, source_media, description)
+        if 'hidden' in categories:
+            return
+
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
 
         # Generate item id
-        id = item_utils.generate_item_id_from_properties(
+        item_id = item_utils.generate_item_id_from_properties(
             filepath,
             processor_output.get('properties', {}),
             description
         )
 
+        # Generate file ID
+        file_id = generate_id(filepath)
+
         base_item_dict = {
-                'item_id': id,
+                'item_id': item_id,
                 'type': 'item'
             }
 
@@ -173,7 +182,7 @@ class FacetExtractor(BaseExtractor):
         body = dict_merge(base_item_dict, processor_output)
 
         output = {
-            'id': id,
+            'id': item_id,
             'body': body
         }
 
@@ -182,7 +191,7 @@ class FacetExtractor(BaseExtractor):
 
         # Add item id to asset
         output = {
-            'id': generate_id(filepath),
+            'id': file_id,
             'body': {
                 'collection_id': id
             }
