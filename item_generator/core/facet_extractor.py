@@ -193,7 +193,7 @@ class FacetExtractor(BaseExtractor):
         output = {
             'id': file_id,
             'body': {
-                'collection_id': item_id
+                'item_id': item_id
             }
         }
 
