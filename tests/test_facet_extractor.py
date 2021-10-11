@@ -159,7 +159,7 @@ def test_process_file(extractor, capsys):
     }
 
     expected_asset = {'id': '3b65eee251f13679d90ca569061dd407',
-                      'body': {'collection_id': 'e51bff4c0c383366fcb422983f5b1de3'}}
+                      'body': {'item_id': 'e51bff4c0c383366fcb422983f5b1de3'}}
 
     extractor.process_file(path, 'POSIX')
 
