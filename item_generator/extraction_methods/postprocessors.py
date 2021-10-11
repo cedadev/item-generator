@@ -74,8 +74,6 @@ class FacetMapProcessor(BasePostProcessor):
 
 class ISODateProcessor(BasePostProcessor):
     """
-    ISO 8601 Date Processor
-    -----------------------
 
     Processor Name: ``isodate_processor``
 
@@ -199,6 +197,7 @@ class StringJoinProcessor(BasePostProcessor):
 
     Example Configuration:
 
+
     .. code-block:: yaml
 
         post_processors:
@@ -208,7 +207,7 @@ class StringJoinProcessor(BasePostProcessor):
                    - year
                    - month
                    - day
-                delimiter: -
+                delimiter: "-"
                 output_key: datetime
 
     """
