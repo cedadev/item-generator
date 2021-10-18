@@ -30,7 +30,7 @@ setup(
     test_suite='tests',
     install_requires=[
         'asset_scanner',
-        'directory_tree',
+        'ceda-directory-tree',
         'python-dateutil',
         'requests',
     ],
