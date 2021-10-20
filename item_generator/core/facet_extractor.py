@@ -148,6 +148,9 @@ class FacetExtractor(BaseExtractor):
         :param source_media:
         :return:
         """
+        # Generate file ID
+        file_id = generate_id(filepath)
+
         filepath = self._get_path(filepath, **kwargs)
 
         LOGGER.info(f'Processing: {filepath}')
@@ -169,9 +172,6 @@ class FacetExtractor(BaseExtractor):
             processor_output.get('properties', {}),
             description
         )
-
-        # Generate file ID
-        file_id = generate_id(filepath)
 
         base_item_dict = {
                 'item_id': item_id,
