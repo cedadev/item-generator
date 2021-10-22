@@ -151,8 +151,6 @@ class FacetExtractor(BaseExtractor):
         # Generate file ID
         file_id = generate_id(filepath)
 
-        filepath = self._get_path(filepath, **kwargs)
-
         LOGGER.info(f'Processing: {filepath}')
 
         # Get dataset description file
