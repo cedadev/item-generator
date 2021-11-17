@@ -84,6 +84,11 @@ class FacetExtractor(BaseExtractor):
         """
 
         return getattr(self, group).get_processor(name, **kwargs)
+    
+    def get_collection_id(self, description: ItemDescription) -> str:
+        """Return the collection ID for the file."""
+        coll_id = description.collection.get('id')
+        return coll_id
 
     def run_processors(self,
                        filepath: str,
@@ -101,11 +106,6 @@ class FacetExtractor(BaseExtractor):
         """
         # Get default tags
         tags = description.defaults
-
-        # Get collection id
-        coll_id = description.collection.get('id')
-        if coll_id:
-            tags['collection_id'] = coll_id
 
         # Execute facet extraction functions
         processors = description.extraction_methods
@@ -178,6 +178,11 @@ class FacetExtractor(BaseExtractor):
 
         # Merge processor output with base defaults
         body = dict_merge(base_item_dict, processor_output)
+        
+        # Get collection id
+        coll_id = self.get_collection_id(description)
+        if coll_id:
+            body['collection_id'] = coll_id
 
         output = {
             'id': item_id,
