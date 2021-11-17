@@ -36,12 +36,12 @@ def is_remote_uri(path: str) -> bool:
     return bool(re.search(r"^[a-z][a-z0-9]*(\://|\:\:)", path))
 
 
-def generate_item_id_from_properties(filepath, tags, description):
+def generate_item_id_from_properties(filepath, collection_id, tags, description):
 
     has_all_facets = all([facet in tags for facet in description.aggregation_facets])
 
     if has_all_facets:
-        id_string = ''
+        id_string = collection_id
         for facet in description.aggregation_facets:
             vals = tags.get(facet)
             if isinstance(vals, (str, int)):
@@ -51,7 +51,7 @@ def generate_item_id_from_properties(filepath, tags, description):
 
         return generate_id(id_string)
 
-    return generate_id(filepath)
+    return generate_id(f'{collection_id}.{filepath}')
 
 
 def isoformat_date(date_string: str, format=None) -> Tuple[Optional[str], bool]:

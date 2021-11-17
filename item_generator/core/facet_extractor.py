@@ -107,6 +107,11 @@ class FacetExtractor(BaseExtractor):
     def get_collection_id(self, description: ItemDescription) -> str:
         """Return the collection ID for the file."""
         coll_id = description.collection.get('id')
+
+        # Provide a default collection
+        if not coll_id:
+            coll_id = 'undefined'
+
         return coll_id
 
     def run_processors(self,
@@ -172,6 +177,9 @@ class FacetExtractor(BaseExtractor):
 
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
 
+        # Get collection id
+        coll_id = self.get_collection_id(description)
+
         # Generate item id
         item_id = item_utils.generate_item_id_from_properties(
             filepath,
@@ -181,16 +189,12 @@ class FacetExtractor(BaseExtractor):
 
         base_item_dict = {
                 'item_id': item_id,
-                'type': 'item'
+                'type': 'item',
+                'collection_id': coll_id
             }
 
         # Merge processor output with base defaults
         body = dict_merge(base_item_dict, processor_output)
-        
-        # Get collection id
-        coll_id = self.get_collection_id(description)
-        if coll_id:
-            body['collection_id'] = coll_id
 
         output = {
             'id': item_id,
