@@ -84,6 +84,25 @@ class FacetExtractor(BaseExtractor):
         """
 
         return getattr(self, group).get_processor(name, **kwargs)
+
+    def _run_processor(self, processor: dict, filepath: str, source_media: StorageType) -> dict:
+        """Run the specified processor."""
+
+        # Load the processors
+        p = self._load_processor(processor)
+        pre_processors = self._load_extra_processors(processor, 'pre_processors')
+        post_processors = self._load_extra_processors(processor, 'post_processors')
+
+        # Retrieve the metadata
+        metadata = p.run(filepath, source_media=source_media, post_processors=post_processors,
+                         pre_processors=pre_processors)
+
+        output_key = getattr(p, 'output_key', None)
+
+        if output_key and metadata:
+            metadata = dot2dict(output_key, metadata)
+
+        return metadata
     
     def get_collection_id(self, description: ItemDescription) -> str:
         """Return the collection ID for the file."""
@@ -111,19 +130,8 @@ class FacetExtractor(BaseExtractor):
         processors = description.extraction_methods
 
         for processor in processors:
-            # Load the processors
-            p = self._load_processor(processor)
-            pre_processors = self._load_extra_processors(processor, 'pre_processors')
-            post_processors = self._load_extra_processors(processor, 'post_processors')
 
-            # Retrieve the metadata
-            metadata = p.run(filepath, source_media=source_media, post_processors=post_processors,
-                             pre_processors=pre_processors)
-
-            output_key = getattr(p, 'output_key', None)
-
-            if output_key and metadata:
-                metadata = dot2dict(output_key, metadata)
+            metadata = self._run_processor(processor, filepath, source_media)
 
             # Merge the extracted metadata with the metadata already retrieved
             if metadata:
