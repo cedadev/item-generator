@@ -12,8 +12,14 @@ import pytest
 import os
 from unittest import TestCase
 import ast
+from pathlib import Path
+
+from asset_scanner.core.utils import generate_id
+from asset_scanner.core.item_describer import ItemDescriptions
+from asset_scanner.types.source_media import StorageType
 
 from item_generator import FacetExtractor
+
 
 PROCESSORS = [
     'regex',
@@ -65,7 +71,6 @@ def extractor_conf(data_path):
 def extractor(extractor_conf):
     """Initialise facet extractor"""
     return FacetExtractor(extractor_conf)
-
 
 def test_can_load_processors(extractor):
     """
@@ -146,9 +151,10 @@ def test_process_file(extractor, capsys):
     """
     path = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
     expected_facet = {
-        'id': 'e51bff4c0c383366fcb422983f5b1de3',
+        'id': 'c9ba1eb86ad1599bc715791e9f5af9de',
         'body': {
-            'item_id': 'e51bff4c0c383366fcb422983f5b1de3',
+            'item_id': 'c9ba1eb86ad1599bc715791e9f5af9de',
+            'collection_id': '5e543256c480ac577d30f76f9120eb74',
             'type': 'item',
             'properties': {
                 'datetime': '2005-01-05T00:00:00',
@@ -159,7 +165,7 @@ def test_process_file(extractor, capsys):
     }
 
     expected_asset = {'id': '3b65eee251f13679d90ca569061dd407',
-                      'body': {'item_id': 'e51bff4c0c383366fcb422983f5b1de3'}}
+                      'body': {'item_id': 'c9ba1eb86ad1599bc715791e9f5af9de'}}
 
     extractor.process_file(path, 'POSIX')
 
@@ -173,3 +179,80 @@ def test_process_file(extractor, capsys):
 
     TestCase().assertDictEqual(expected_facet, facets)
     TestCase().assertDictEqual(expected_asset, assets)
+
+
+def test_collection_id_undefined(extractor, data_path):
+    """Test when no id section is present.
+
+    This should return MD5 hash of undefined
+    """
+
+    filepath = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
+    expected = generate_id('undefined')
+
+    description = extractor.item_descriptions.get_description(filepath)
+    id = extractor.get_collection_id(description, filepath, StorageType.POSIX)
+
+    assert id == expected
+
+
+def test_collection_id_default(extractor, data_path):
+    """Test when no id section is present with default and no processor.
+
+    This should return MD5 hash of default
+    """
+
+    # Specify item description
+    file_list = [os.path.join(
+        data_path,
+        'collection_descriptions',
+        'faam_default_collection_id.yml'
+    )]
+
+    file_list = [Path(file) for file in file_list]
+
+    item_description = ItemDescriptions(
+        filelist=file_list
+    )
+
+    # Replace item descriptions object
+    extractor.item_descriptions = item_description
+
+    filepath = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
+    expected = generate_id('faam_collection')
+
+    description = extractor.item_descriptions.get_description(filepath)
+    id = extractor.get_collection_id(description, filepath, StorageType.POSIX)
+    print(id)
+
+    assert id == expected
+
+def test_collection_id_generated(extractor, data_path):
+    """Test when no id section is present with default and no processor.
+
+    This should return MD5 hash of default
+    """
+
+    # Specify item description to load
+    file_list = [os.path.join(
+        data_path,
+        'collection_descriptions',
+        'faam_generated_collection_id.yml'
+    )]
+
+    file_list = [Path(file) for file in file_list]
+
+    item_description = ItemDescriptions(
+        filelist=file_list
+    )
+
+    # Replace item descriptions object
+    extractor.item_descriptions = item_description
+
+    filepath = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
+    expected = generate_id('faam')
+
+    description = extractor.item_descriptions.get_description(filepath)
+    id = extractor.get_collection_id(description, filepath, StorageType.POSIX)
+
+    assert id == expected

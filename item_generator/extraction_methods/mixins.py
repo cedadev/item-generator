@@ -19,7 +19,7 @@ class PropertiesOutputKeyMixin:
 
     def __init__(self, **kwargs):
 
-        if not kwargs.get('output_key'):
+        if kwargs.get('output_key') is None:
             kwargs['output_key'] = 'properties'
 
         super().__init__(**kwargs)

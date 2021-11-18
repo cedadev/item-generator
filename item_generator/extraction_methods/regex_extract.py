@@ -51,7 +51,8 @@ class RegexExtract(PropertiesOutputKeyMixin, BaseProcessor):
         - ``post_processors``: List of post_processors to apply
         - ``output_key``: When the metadata is returned, this key determines
           where the metadata is fit in the response. Dot separated
-          strings can be used to created nested attributes.
+          strings can be used to created nested attributes. An empty string can
+          be used to return the output with no prefix.
           ``default: 'properties'``
 
 

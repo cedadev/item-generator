@@ -1,5 +1,9 @@
 paths:
   - /badc/faam/data
+collections:
+  id:
+    defaults:
+        collection_id: faam_collection
 facets:
   allowed_facets:
     - project

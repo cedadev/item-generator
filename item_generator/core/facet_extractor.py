@@ -104,15 +104,30 @@ class FacetExtractor(BaseExtractor):
 
         return metadata
     
-    def get_collection_id(self, description: ItemDescription) -> str:
+    def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
-        coll_id = description.collection.get('id')
+        collections_id_def = getattr(description.collections, 'id', None)
+        collection_id = 'undefined'
 
-        # Provide a default collection
-        if not coll_id:
-            coll_id = 'undefined'
+        if collections_id_def:
 
-        return coll_id
+            # Retrieve defaults
+            tags = collections_id_def.defaults
+
+            # Run the processors
+            for processor in collections_id_def.extraction_methods:
+                metadata = self._run_processor(processor, filepath, storage_media)
+
+                if metadata:
+                    tags = dict_merge(tags, metadata)
+
+            # Check to see if we have pulled out a collection id
+            generated_id = tags.get('collection_id')
+
+            if generated_id:
+                collection_id = generated_id
+
+        return generate_id(collection_id)
 
     def run_processors(self,
                        filepath: str,
@@ -129,10 +144,10 @@ class FacetExtractor(BaseExtractor):
         :return: result from the processing
         """
         # Get default tags
-        tags = description.defaults
+        tags = description.facets.defaults
 
         # Execute facet extraction functions
-        processors = description.extraction_methods
+        processors = description.facets.extraction_methods
 
         for processor in processors:
 
@@ -178,11 +193,12 @@ class FacetExtractor(BaseExtractor):
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
 
         # Get collection id
-        coll_id = self.get_collection_id(description)
+        coll_id = self.get_collection_id(description, filepath, source_media)
 
         # Generate item id
         item_id = item_utils.generate_item_id_from_properties(
             filepath,
+            coll_id,
             processor_output.get('properties', {}),
             description
         )

@@ -38,17 +38,16 @@ def is_remote_uri(path: str) -> bool:
 
 def generate_item_id_from_properties(filepath, collection_id, tags, description):
 
-    has_all_facets = all([facet in tags for facet in description.aggregation_facets])
+    has_all_facets = all([facet in tags for facet in description.facets.aggregation_facets])
 
     if has_all_facets:
         id_string = collection_id
-        for facet in description.aggregation_facets:
+        for facet in description.facets.aggregation_facets:
             vals = tags.get(facet)
             if isinstance(vals, (str, int)):
                 id_string = '.'.join((id_string, vals))
             if isinstance(vals, (list)):
                 id_string = '.'.join((id_string, f'multi_{facet}'))
-
         return generate_id(id_string)
 
     return generate_id(f'{collection_id}.{filepath}')
