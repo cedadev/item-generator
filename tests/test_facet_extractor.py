@@ -227,10 +227,11 @@ def test_collection_id_default(extractor, data_path):
 
     assert id == expected
 
-def test_collection_id_generated(extractor, data_path):
-    """Test when no id section is present with default and no processor.
 
-    This should return MD5 hash of default
+def test_collection_id_generated(extractor, data_path):
+    """Test when no id section is present with processor.
+
+    This should return MD5 hash of `faam`
     """
 
     # Specify item description to load
