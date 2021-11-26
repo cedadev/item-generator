@@ -130,11 +130,6 @@ class FacetExtractor(BaseExtractor):
             if metadata:
                 tags = dict_merge(tags, metadata)
 
-            print(f"\033[93m"
-                  f"processor: {processor}, {p}\n"
-                  f"metadata: {metadata}\n"
-                  f"\033[0m")
-
         # Process multi-values
 
         # Apply mappings
