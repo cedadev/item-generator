@@ -130,6 +130,11 @@ class FacetExtractor(BaseExtractor):
             if metadata:
                 tags = dict_merge(tags, metadata)
 
+            print(f"\033[93m"
+                  f"processor: {processor}, {p}\n"
+                  f"metadata: {metadata}\n"
+                  f"\033[0m")
+
         # Process multi-values
 
         # Apply mappings
@@ -166,18 +171,13 @@ class FacetExtractor(BaseExtractor):
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
 
         # Generate title and description properties from templates
-        if properties := processor_output.get('properties', {}) and description.templates:
+        if (properties := processor_output.get('properties', {})) and description.templates:
             if title_template := description.title_template:
                 title = Template(title_template).safe_substitute(properties)
                 properties['title'] = title
             if desc_template := description.description_template:
                 desc = Template(desc_template).safe_substitute(properties)
                 properties['description'] = desc
-
-        print(f"\033[94m"
-              f"output: {processor_output}\n"
-              f"templates: {description.__dict__}"
-              f"\033[0m")
 
         # Generate item id
         item_id = item_utils.generate_item_id_from_properties(
