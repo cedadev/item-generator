@@ -164,9 +164,10 @@ class FacetExtractor(BaseExtractor):
             return
 
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
+        properties = processor_output.get('properties', {})
 
         # Generate title and description properties from templates
-        if (properties := processor_output.get('properties', {})) and description.templates:
+        if properties and description.templates:
             if title_template := description.title_template:
                 title = Template(title_template).safe_substitute(properties)
                 properties['title'] = title
@@ -184,7 +185,6 @@ class FacetExtractor(BaseExtractor):
         base_item_dict = {
                 'item_id': item_id,
                 'type': 'item',
-                'properties': properties,
             }
 
         # Merge processor output with base defaults

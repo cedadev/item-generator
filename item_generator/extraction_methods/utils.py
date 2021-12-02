@@ -48,7 +48,6 @@ def generate_item_id_from_properties(filepath, tags, description):
                 id_string = '.'.join((id_string, vals))
             if isinstance(vals, (list)):
                 id_string = '.'.join((id_string, f'multi_{facet}'))
-
         return generate_id(id_string)
 
     return generate_id(filepath)
