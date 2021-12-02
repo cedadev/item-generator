@@ -173,3 +173,42 @@ def test_process_file(extractor, capsys):
 
     TestCase().assertDictEqual(expected_facet, facets)
     TestCase().assertDictEqual(expected_asset, assets)
+
+
+def test_templating(extractor, capsys):
+    """
+       Check the process_file method. As this method does not return a value,
+       need to capture the stdout and test against that. Check that the template
+       engine works as expected.
+       """
+    path = '/badc/spam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
+    expected_facet = {
+        'id': 'ff60a33fd72cae1f8a9210348882712b',
+        'body': {
+            'item_id': 'ff60a33fd72cae1f8a9210348882712b',
+            'type': 'item',
+            'properties': {
+                'datetime': '2005-01-05T00:00:00',
+                'platform': 'spam',
+                'flight_number': 'b069',
+                'title': 'spam flight no. b069',
+                'description': 'Data recorded as part of the spam project during flight number b069 which took place on 2005-01-05T00:00:00.'
+            }
+        }
+    }
+
+    expected_asset = {'id': '3837bdccf0b2ef3efcb0e9017de95365',
+                      'body': {'item_id': 'ff60a33fd72cae1f8a9210348882712b'}}
+
+    extractor.process_file(path, 'POSIX')
+
+    # Parse the stdout to retrive the output
+    captured = capsys.readouterr()
+    facets, assets = captured.out.strip().split('\n')
+
+    # Can't use JSON.loads() as string in format "{'key':'value'}"
+    facets = ast.literal_eval(facets)
+    assets = ast.literal_eval(assets)
+
+    TestCase().assertDictEqual(expected_facet, facets)
+    TestCase().assertDictEqual(expected_asset, assets)

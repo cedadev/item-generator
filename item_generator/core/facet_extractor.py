@@ -30,6 +30,7 @@ from item_generator.extraction_methods import utils as item_utils
 LOGGER = logging.getLogger(__name__)
 
 from typing import List
+from string import Template
 
 
 class FacetExtractor(BaseExtractor):
@@ -163,17 +164,27 @@ class FacetExtractor(BaseExtractor):
             return
 
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
+        properties = processor_output.get('properties', {})
+
+        # Generate title and description properties from templates
+        if properties and description.templates:
+            if title_template := description.title_template:
+                title = Template(title_template).safe_substitute(properties)
+                properties['title'] = title
+            if desc_template := description.description_template:
+                desc = Template(desc_template).safe_substitute(properties)
+                properties['description'] = desc
 
         # Generate item id
         item_id = item_utils.generate_item_id_from_properties(
             filepath,
-            processor_output.get('properties', {}),
+            properties,
             description
         )
 
         base_item_dict = {
                 'item_id': item_id,
-                'type': 'item'
+                'type': 'item',
             }
 
         # Merge processor output with base defaults
