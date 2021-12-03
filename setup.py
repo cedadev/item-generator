@@ -56,26 +56,5 @@ setup(
         'asset_scanner.extractors': [
           'item_generator = item_generator:FacetExtractor',
         ],
-        'item_generator.facet_extractors': [
-            'regex = item_generator.extraction_methods.regex_extract:RegexExtract',
-            'header_extract = item_generator.extraction_methods.header_extract.header_extract:HeaderExtract',
-            'iso19115 = item_generator.extraction_methods.iso19115_extract:ISO19115Extract',
-            'xml_extract = item_generator.extraction_methods.xml_extract:XMLExtract',
-        ],
-        'item_generator.extraction_methods.header_extract.backends': [
-            'xarray = item_generator.extraction_methods.header_extract.backends.xarray:XarrayBackend',
-            'cf = item_generator.extraction_methods.header_extract.backends.cf:CfBackend',
-        ],
-        'item_generator.pre_processors': [
-            'filename_reducer = item_generator.extraction_methods.preprocessors:ReducePathtoName',
-            'ceda_observation = item_generator.extraction_methods.preprocessors:CEDAObservation',
-        ],
-        'item_generator.post_processors': [
-            'isodate_processor = item_generator.extraction_methods.postprocessors:ISODateProcessor',
-            'facet_map = item_generator.extraction_methods.postprocessors:FacetMapProcessor',
-            'stac_bbox = item_generator.extraction_methods.postprocessors:BBOXProcessor',
-            'string_join = item_generator.extraction_methods.postprocessors:StringJoinProcessor',
-            'date_combinator = item_generator.extraction_methods.postprocessors:DateCombinatorProcessor',
-        ]
     }
 )

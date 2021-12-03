@@ -25,7 +25,7 @@ from asset_scanner.core.processor import BaseProcessor
 from asset_scanner.core.utils import dict_merge, dot2dict, generate_id
 from asset_scanner.types.source_media import StorageType
 
-from item_generator.extraction_methods import utils as item_utils
+from asset_scanner.plugins.extraction_methods import utils as item_utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,77 +33,7 @@ from typing import List
 
 
 class FacetExtractor(BaseExtractor):
-    PROCESSOR_ENTRY_POINT = 'item_generator.facet_extractors'
 
-    def __init__(self, conf: dict):
-        super().__init__(conf)
-
-        self.pre_processors = self.load_processors(entrypoint='item_generator.pre_processors')
-        self.post_processors = self.load_processors(entrypoint='item_generator.post_processors')
-
-    def _load_extra_processors(self, processor: dict, key: str) -> List[BaseProcessor]:
-        """
-        Load the post processors for the given processor
-
-        :param processor: Configuration for the processor including any post processor
-        :param key: The name of the key which holds the list of extra processors
-
-        :return: List of loaded processors.
-        """
-
-        loaded_pprocessors = []
-
-        for pprocessor in processor.get(key, []):
-            pp_name = pprocessor['name']
-            pp_kwargs = pprocessor.get('inputs', {})
-
-            loaded = self._get_processor(pp_name, key, **pp_kwargs)
-
-            if loaded:
-                loaded_pprocessors.append(loaded)
-
-        return loaded_pprocessors
-
-    def _load_processor(self, processor: dict) -> BaseProcessor:
-        processor_name = processor['name']
-        processor_inputs = processor.get('inputs', {})
-        output_key = processor.get('output_key')
-
-        return self._get_processor(
-            processor_name,
-            'processors',
-            output_key=output_key,
-            **processor_inputs
-        )
-
-    def _get_processor(self, name: str, group: str = 'processors', **kwargs) -> BaseProcessor:
-        """
-
-        :param name: Name of the requested processor
-        :return: processor object
-        """
-
-        return getattr(self, group).get_processor(name, **kwargs)
-
-    def _run_processor(self, processor: dict, filepath: str, source_media: StorageType) -> dict:
-        """Run the specified processor."""
-
-        # Load the processors
-        p = self._load_processor(processor)
-        pre_processors = self._load_extra_processors(processor, 'pre_processors')
-        post_processors = self._load_extra_processors(processor, 'post_processors')
-
-        # Retrieve the metadata
-        metadata = p.run(filepath, source_media=source_media, post_processors=post_processors,
-                         pre_processors=pre_processors)
-
-        output_key = getattr(p, 'output_key', None)
-
-        if output_key and metadata:
-            metadata = dot2dict(output_key, metadata)
-
-        return metadata
-    
     def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
         collections_id_def = getattr(description.collections, 'id', None)
@@ -116,7 +46,7 @@ class FacetExtractor(BaseExtractor):
 
             # Run the processors
             for processor in collections_id_def.extraction_methods:
-                metadata = self._run_processor(processor, filepath, storage_media)
+                metadata = self._run_facet_processor(processor, filepath, storage_media)
 
                 if metadata:
                     tags = dict_merge(tags, metadata)
@@ -151,7 +81,7 @@ class FacetExtractor(BaseExtractor):
 
         for processor in processors:
 
-            metadata = self._run_processor(processor, filepath, source_media)
+            metadata = self._run_facet_processor(processor, filepath, source_media)
 
             # Merge the extracted metadata with the metadata already retrieved
             if metadata:

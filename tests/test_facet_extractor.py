@@ -77,7 +77,7 @@ def test_can_load_processors(extractor):
     Check we have loaded all processors we expect to load
     """
     for processor in PROCESSORS:
-        assert extractor._get_processor(processor)
+        assert extractor._get_processor(processor, 'facet_processors')
 
 
 def test_can_load_pre_processors(extractor):
@@ -104,7 +104,7 @@ def test__load_processor(extractor):
         'name': 'regex'
     }
 
-    p = extractor._load_processor(processor)
+    p = extractor._load_facet_processor(processor)
     assert p.__class__.__name__ == 'RegexExtract'
 
 
