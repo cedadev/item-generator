@@ -36,28 +36,8 @@ class FacetExtractor(BaseExtractor):
 
     def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
-        collections_id_def = getattr(description.collections, 'id', None)
-        collection_id = 'undefined'
-
-        if collections_id_def:
-
-            # Retrieve defaults
-            tags = collections_id_def.defaults
-
-            # Run the processors
-            for processor in collections_id_def.extraction_methods:
-                metadata = self._run_facet_processor(processor, filepath, storage_media)
-
-                if metadata:
-                    tags = dict_merge(tags, metadata)
-
-            # Check to see if we have pulled out a collection id
-            generated_id = tags.get('collection_id')
-
-            if generated_id:
-                collection_id = generated_id
-
-        return generate_id(collection_id)
+        collection_id = getattr(description.collections, 'id', 'undefined')
+        return collection_id
 
     def run_processors(self,
                        filepath: str,
