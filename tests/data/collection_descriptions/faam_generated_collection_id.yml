@@ -1,12 +1,7 @@
 paths:
   - /badc/faam/data
 collections:
-  id:
-    extraction_methods:
-      - name: regex
-        inputs:
-           regex: '/badc/(?P<collection_id>[^/]*)'
-        output_key: ''
+  id: faam
 facets:
   allowed_facets:
     - project

@@ -181,7 +181,7 @@ def test_process_file(extractor, capsys):
     TestCase().assertDictEqual(expected_asset, assets)
 
 
-def test_collection_id_undefined(extractor, data_path):
+def test_collection_id_undefined(extractor):
     """Test when no id section is present.
 
     This should return MD5 hash of undefined
@@ -219,7 +219,7 @@ def test_collection_id_default(extractor, data_path):
     extractor.item_descriptions = item_description
 
     filepath = '/badc/faam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
-    expected = generate_id('faam_collection')
+    expected = generate_id('undefined')
 
     description = extractor.item_descriptions.get_description(filepath)
     id = extractor.get_collection_id(description, filepath, StorageType.POSIX)

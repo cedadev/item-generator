@@ -37,7 +37,7 @@ class FacetExtractor(BaseExtractor):
     def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
         collection_id = getattr(description.collections, 'id', 'undefined')
-        return collection_id
+        return generate_id(collection_id)
 
     def run_processors(self,
                        filepath: str,
