@@ -15,6 +15,7 @@ with open("README.md") as readme_file:
 
 setup(
     name='item_generator',
+    version='1.0.0',
     description='Extracts facets from the individual files and generates an identifier which can be used to aggregate',
     author='Richard Smith',
     url='https://github.com/cedadev/item-generator/',
