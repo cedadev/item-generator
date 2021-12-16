@@ -108,12 +108,12 @@ class FacetExtractor(BaseExtractor):
         templates = description.facets.templates
 
         if properties and templates:
-            if templates.title_template:
-                title_template = templates.title_template
+            if templates.title:
+                title_template = templates.title
                 title = Template(title_template).safe_substitute(properties)
                 properties['title'] = title
-            if templates.description_template:
-                desc_template = templates.description_template
+            if templates.description:
+                desc_template = templates.description
                 desc = Template(desc_template).safe_substitute(properties)
                 properties['description'] = desc
 

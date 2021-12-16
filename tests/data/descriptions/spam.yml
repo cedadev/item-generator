@@ -19,5 +19,5 @@ facets:
     - platform
     - flight_number
   templates:
-      title_template: $platform flight no. $flight_number
-      description_template: Data recorded as part of the $platform project during flight number $flight_number which took place on $datetime.
+      title: $platform flight no. $flight_number
+      description: Data recorded as part of the $platform project during flight number $flight_number which took place on $datetime.
