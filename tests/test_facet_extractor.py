@@ -24,18 +24,21 @@ from item_generator import FacetExtractor
 PROCESSORS = [
     'regex',
     'header_extract',
-    'iso19115'
+    'iso19115',
+    'xml_extract',
 ]
 
 PRE_PROCESSORS = [
     'filename_reducer',
-    'ceda_observation'
+    'ceda_observation',
 ]
 
 POST_PROCESSORS = [
     'isodate_processor',
     'facet_map',
-    'stac_bbox'
+    'stac_bbox',
+    'string_join',
+    'date_combinator',
 ]
 
 
