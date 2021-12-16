@@ -28,6 +28,7 @@ setup(
         ]
     },
     test_suite='tests',
+    python_requires='>=3.8',
     install_requires=[
         'asset_scanner',
         'ceda-directory-tree',

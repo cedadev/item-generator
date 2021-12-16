@@ -30,6 +30,7 @@ from asset_scanner.plugins.extraction_methods import utils as item_utils
 LOGGER = logging.getLogger(__name__)
 
 from typing import List
+from string import Template
 
 
 class FacetExtractor(BaseExtractor):
@@ -101,6 +102,20 @@ class FacetExtractor(BaseExtractor):
             return
 
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
+        properties = processor_output.get('properties', {})
+
+        # Generate title and description properties from templates
+        templates = description.facets.templates
+
+        if properties and templates:
+            if templates.title_template:
+                title_template = templates.title_template
+                title = Template(title_template).safe_substitute(properties)
+                properties['title'] = title
+            if templates.description_template:
+                desc_template = templates.description_template
+                desc = Template(desc_template).safe_substitute(properties)
+                properties['description'] = desc
 
         # Get collection id
         coll_id = self.get_collection_id(description, filepath, source_media)
@@ -109,7 +124,7 @@ class FacetExtractor(BaseExtractor):
         item_id = item_utils.generate_item_id_from_properties(
             filepath,
             coll_id,
-            processor_output.get('properties', {}),
+            properties,
             description
         )
 

@@ -8,11 +8,11 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-import pytest
-import os
-from unittest import TestCase
 import ast
+import os
+import pytest
 from pathlib import Path
+from unittest import TestCase
 
 from asset_scanner.core.utils import generate_id
 from asset_scanner.core.item_describer import ItemDescriptions
@@ -260,3 +260,27 @@ def test_collection_id_generated(extractor, data_path):
     id = extractor.get_collection_id(description, filepath, StorageType.POSIX)
 
     assert id == expected
+
+
+def test_templating(extractor, capsys):
+    """
+       Check the process_file method. As this method does not return a value,
+       need to capture the stdout and test against that. Check that the template
+       engine works as expected.
+       """
+    path = '/badc/spam/data/2005/b069-jan-05/core_processed/core_faam_20050105_r0_b069.nc'
+    expected_title = 'spam flight no. b069'
+    expected_description = 'Data recorded as part of the spam project during flight number b069 which took place on 2005-01-05T00:00:00.'
+
+    extractor.process_file(path, 'POSIX')
+
+    # Parse the stdout to retrive the output
+    captured = capsys.readouterr()
+    facets, assets = captured.out.strip().split('\n')
+
+    # Can't use JSON.loads() as string in format "{'key':'value'}"
+    facets = ast.literal_eval(facets)
+    assets = ast.literal_eval(assets)
+
+    assert facets['body']['properties']['title'] == expected_title
+    assert facets['body']['properties']['description'] == expected_description
