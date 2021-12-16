@@ -1,6 +1,12 @@
 paths:
   - /badc/faam/data
+collections:
+  id: faam
 facets:
+  allowed_facets:
+    - project
+    - flight_number
+    - datetime
   extraction_methods:
     - name: regex
       inputs:
