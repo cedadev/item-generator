@@ -27,6 +27,8 @@ from asset_scanner.types.source_media import StorageType
 
 from asset_scanner.plugins.extraction_methods import utils as item_utils
 
+from typing import Dict
+
 LOGGER = logging.getLogger(__name__)
 
 from typing import List
@@ -34,6 +36,8 @@ from string import Template
 
 
 class FacetExtractor(BaseExtractor):
+
+    PROCESSOR_ENTRY_POINT = 'asset_scanner.processors'
 
     def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
@@ -80,7 +84,15 @@ class FacetExtractor(BaseExtractor):
 
         return tags
 
-    def process_file(self, filepath, source_media, **kwargs):
+    def get_sumaries(self, item_id: str, description: 'ItemDescription') -> Dict:
+
+        processor = self._load_processor()
+
+        metadata = processor.run(item_id, description)
+
+        return metadata
+
+    def process_file(self, filepath: str, source_media: str = 'POSIX', **kwargs):
         """
         Method to outline the processing pipeline for an individual file
         :param filepath:
@@ -95,13 +107,11 @@ class FacetExtractor(BaseExtractor):
         # Get dataset description file
         description = self.item_descriptions.get_description(filepath)
 
-        # Do not run processors if the asset has been marked as hidden. This
-        # prevents files like .ftpaccess files from becoming STAC items
-        categories = self.get_categories(filepath, source_media, description)
-        if 'hidden' in categories:
-            return
+        # Get summaries - aggregated properties from assets.
+        summaries = self.get_sumaries(kwargs['item_id'], description)
 
         processor_output = self.run_processors(filepath, description, source_media, **kwargs)
+
         properties = processor_output.get('properties', {})
 
         # Generate title and description properties from templates
@@ -111,31 +121,39 @@ class FacetExtractor(BaseExtractor):
             if templates.title:
                 title_template = templates.title
                 title = Template(title_template).safe_substitute(properties)
-                properties['title'] = title
+                summaries['title'] = title
             if templates.description:
                 desc_template = templates.description
                 desc = Template(desc_template).safe_substitute(properties)
-                properties['description'] = desc
+                summaries['description'] = desc
 
         # Get collection id
         coll_id = self.get_collection_id(description, filepath, source_media)
 
         # Generate item id
-        item_id = item_utils.generate_item_id_from_properties(
-            filepath,
-            coll_id,
-            properties,
-            description
-        )
+        if kwargs.get('item_id'):
+            item_id = kwargs['item_id']
+        else:
+            item_id = item_utils.generate_item_id_from_properties(
+                filepath,
+                coll_id,
+                properties,
+                description
+            )
 
-        base_item_dict = {
+        # Merge properties (facets from the item description) and summaries (facets from elasticsearch aggregations)
+        for key, value in properties.items():
+            if type(value) == str:
+                properties[key] = [value]
+
+        merged_properties = dict_merge(summaries, properties)
+
+        body = {
                 'item_id': item_id,
                 'type': 'item',
-                'collection_id': coll_id
+                'collection_id': coll_id,
+                'properties': merged_properties
             }
-
-        # Merge processor output with base defaults
-        body = dict_merge(base_item_dict, processor_output)
 
         output = {
             'id': item_id,
@@ -144,13 +162,3 @@ class FacetExtractor(BaseExtractor):
 
         # Output the item
         self.output(filepath, source_media, output, namespace='facets')
-
-        # Add item id to asset
-        output = {
-            'id': file_id,
-            'body': {
-                'item_id': item_id
-            }
-        }
-
-        self.output(filepath, source_media, output, namespace='assets')
