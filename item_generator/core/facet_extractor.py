@@ -37,7 +37,7 @@ from string import Template
 
 class FacetExtractor(BaseExtractor):
 
-    PROCESSOR_ENTRY_POINT = 'asset_scanner.processors'
+    PROCESSOR_ENTRY_POINT = 'item_generator.processors'
 
     def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
@@ -128,7 +128,7 @@ class FacetExtractor(BaseExtractor):
                 summaries['description'] = desc
 
         # Get collection id
-        coll_id = self.get_collection_id(description, filepath, source_media)
+        coll_id = description.collections.id
 
         # Generate item id
         if kwargs.get('item_id'):
@@ -161,4 +161,12 @@ class FacetExtractor(BaseExtractor):
         }
 
         # Output the item
-        self.output(filepath, source_media, output, namespace='facets')
+        self.output(filepath, source_media, output, namespace='items')
+
+        header = {
+            'collection_id': coll_id,
+            'filepath': filepath
+        }
+
+        # Output the header
+        self.output(filepath, source_media, header, namespace='header')

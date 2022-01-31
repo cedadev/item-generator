@@ -58,5 +58,8 @@ setup(
         'asset_scanner.extractors': [
           'item_generator = item_generator:FacetExtractor',
         ],
+        "item_generator.processors": [
+            "elasticsearch_aggregator = item_generator.plugins.processors.elasticsearch_aggregator:ElasticsearchAggregator",
+        ],
     }
 )
