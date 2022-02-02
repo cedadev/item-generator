@@ -252,8 +252,6 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         :param description: ItemDescription containing keys to summarise
         """
 
-        metadata = {}
-
         # Get list of aggregation facets and extra top level facets
         facets = set(description.facets.aggregation_facets + description.facets.search_facets)
 
@@ -268,9 +266,7 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         extent = self.get_extent(file_id)
 
         # Package up and return
-        if summaries:
-            metadata['summaries'] = summaries
-        if extent:
-            metadata['extent'] = extent
+        # if extent:
+        #    summaries['extent'] = extent
 
-        return metadata
+        return summaries

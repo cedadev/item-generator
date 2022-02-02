@@ -60,6 +60,7 @@ setup(
         ],
         "item_generator.processors": [
             "elasticsearch_aggregator = item_generator.plugins.processors.elasticsearch_aggregator:ElasticsearchAggregator",
+            "json_aggregator = item_generator.plugins.processors.json_aggregator:JSONAggregator"
         ],
     }
 )
