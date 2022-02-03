@@ -33,11 +33,16 @@ LOGGER = logging.getLogger(__name__)
 
 from typing import List
 from string import Template
-
+from cachetools import LRUCache
 
 class FacetExtractor(BaseExtractor):
 
     PROCESSOR_ENTRY_POINT = 'item_generator.processors'
+
+    def __init__(self, conf: dict):
+        super().__init__(conf)
+        self.header_deduplication = conf.get('header_deduplication', False)
+        self.collection_id_cache = LRUCache(maxsize=5)
 
     def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
@@ -162,6 +167,12 @@ class FacetExtractor(BaseExtractor):
 
         # Output the item
         self.output(filepath, source_media, output, namespace='items')
+
+        # Check to see if coll_id is in the LRU Cache and skip if true.
+        if self.header_deduplication:
+            self.collection_id_cache.update({coll_id: None})
+            if coll_id in list(self.collection_id_cache.keys()):
+                return
 
         header = {
             'collection_id': coll_id,
