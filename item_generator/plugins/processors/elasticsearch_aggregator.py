@@ -264,9 +264,8 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
 
         # Get extent aggregation
         extent = self.get_extent(file_id)
-
-        # Package up and return
-        # if extent:
-        #    summaries['extent'] = extent
+        if extent.get('temporal'):
+            summaries['start_datetime'] = extent['temporal'][0][0]
+            summaries['end_datetime'] = extent['temporal'][0][1]
 
         return summaries
