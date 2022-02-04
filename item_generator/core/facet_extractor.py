@@ -169,15 +169,24 @@ class FacetExtractor(BaseExtractor):
         self.output(filepath, source_media, output, namespace='items')
 
         # Check to see if coll_id is in the LRU Cache and skip if true.
-        if self.header_deduplication:
-            self.collection_id_cache.update({coll_id: None})
-            if coll_id in list(self.collection_id_cache.keys()):
-                return
+        header_kwargs = {}
 
+        # if in LRU cache, update the cache and header_kwargs to add rabbit mq delay
+        # The delay will increase by 5s upto 1 minute if it keeps caching.
+        if coll_id in list(self.collection_id_cache.keys()):
+            # skip output if header deduplication is true, else add a delay kwarg to header.
+            if self.header_deduplication:
+                return
+            self.collection_id_cache.update({coll_id: min(self.collection_id_cache.get(coll_id) + 5000, 60000)})
+        else:
+            self.collection_id_cache.update({coll_id: 0})
+
+        header_kwargs['x-delay'] = self.collection_id_cache.get(coll_id)
         header = {
             'collection_id': coll_id,
-            'filepath': filepath
+            'filepath': filepath,
+            'source_media': source_media
         }
 
         # Output the header
-        self.output(filepath, source_media, header, namespace='header')
+        self.output(filepath, source_media, header, namespace='header', **header_kwargs)
