@@ -33,7 +33,7 @@ LOGGER = logging.getLogger(__name__)
 
 from typing import List
 from string import Template
-from cachetools import LRUCache
+from cachetools import TTLCache
 
 class FacetExtractor(BaseExtractor):
 
@@ -41,8 +41,16 @@ class FacetExtractor(BaseExtractor):
 
     def __init__(self, conf: dict):
         super().__init__(conf)
-        self.header_deduplication = conf.get('header_deduplication', False)
-        self.collection_id_cache = LRUCache(maxsize=5)
+        self.header_deduplicate = conf.get('header_deduplication', False)
+        if self.header_deduplicate:
+            # Get deduplication variables for rabbit mq for `x-delay` in milliseconds
+            self.delay_increment = conf.get('DELAY_INCREMENT', 5000)
+            self.delay_max = conf.get('DELAY_MAX', 30000)
+
+        self.collection_id_cache = TTLCache(
+            maxsize=conf.get('CAHCE_MAX_SIZE', 5),
+            ttl=conf.get('CACHE_MAX_AGE', 60)
+        )
 
     def get_collection_id(self, description: ItemDescription, filepath: str, storage_media: StorageType) -> str:
         """Return the collection ID for the file."""
@@ -170,18 +178,17 @@ class FacetExtractor(BaseExtractor):
 
         # Check to see if coll_id is in the LRU Cache and skip if true.
         header_kwargs = {}
+        if self.header_deduplication:
 
-        # if in LRU cache, update the cache and header_kwargs to add rabbit mq delay
-        # The delay will increase by 5s upto 1 minute if it keeps caching.
-        if coll_id in list(self.collection_id_cache.keys()):
-            # skip output if header deduplication is true, else add a delay kwarg to header.
-            if self.header_deduplication:
-                return
-            self.collection_id_cache.update({coll_id: min(self.collection_id_cache.get(coll_id) + 5000, 60000)})
-        else:
-            self.collection_id_cache.update({coll_id: 0})
+            # if in LRU cache, update the cache and header_kwargs to add rabbit mq delay
+            # The delay will increase by 5s upto 1 minute if it keeps caching.
+            if coll_id in list(self.collection_id_cache.keys()):
+                self.collection_id_cache.update({coll_id: min(self.collection_id_cache.get(coll_id) + 5000, 60000)})
+            else:
+                self.collection_id_cache.update({coll_id: 0})
 
-        header_kwargs['x-delay'] = self.collection_id_cache.get(coll_id)
+            header_kwargs['x-delay'] = self.collection_id_cache.get(coll_id)
+
         header = {
             'collection_id': coll_id,
             'filepath': filepath,
