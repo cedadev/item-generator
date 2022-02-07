@@ -32,6 +32,7 @@ setup(
     python_requires='>=3.8',
     install_requires=[
         'asset_scanner',
+        'cachetools',
         'ceda-directory-tree',
         'python-dateutil',
         'requests',
@@ -48,7 +49,8 @@ setup(
             'sphinxcontrib-programoutput'
         ],
         'dev': [
-            'isort'
+            'isort',
+            'pytest',
         ]
     },
     entry_points={
