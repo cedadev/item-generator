@@ -32,6 +32,7 @@ setup(
     python_requires='>=3.8',
     install_requires=[
         'asset_scanner',
+        'cachetools',
         'ceda-directory-tree',
         'python-dateutil',
         'requests',
@@ -48,7 +49,8 @@ setup(
             'sphinxcontrib-programoutput'
         ],
         'dev': [
-            'isort'
+            'isort',
+            'pytest',
         ]
     },
     entry_points={
@@ -57,6 +59,10 @@ setup(
         ],
         'asset_scanner.extractors': [
           'item_generator = item_generator:FacetExtractor',
+        ],
+        "item_generator.processors": [
+            "elasticsearch_aggregator = item_generator.plugins.processors.elasticsearch_aggregator:ElasticsearchAggregator",
+            "json_aggregator = item_generator.plugins.processors.json_aggregator:JSONAggregator"
         ],
     }
 )
