@@ -19,7 +19,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import logging
 
-from asset_scanner.core import BaseExtractor
+from asset_scanner.core.extractor import BaseExtractor
 from asset_scanner.core.item_describer import ItemDescription, ItemDescriptions
 from asset_scanner.core.processor import BaseProcessor
 from asset_scanner.core.utils import dict_merge, dot2dict, generate_id
