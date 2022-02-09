@@ -172,17 +172,21 @@ class FacetExtractor(BaseExtractor):
         self.output(filepath, source_media, output, namespace='items')
 
         # Check to see if coll_id is in the LRU Cache and skip if true.
-        if self.header_deduplication:
-            if coll_id in list(self.collection_id_cache.keys()):
+        if coll_id in list(self.collection_id_cache.keys()):
+            if self.header_deduplication:
                 return
-            else:
-                self.collection_id_cache.update({coll_id: None})
+            kwargs = {
+                'duplicate': True,
+                'id': coll_id
+            }
+        else:
+            self.collection_id_cache.update({coll_id: None})
 
-        header = {
+        message = {
             'collection_id': coll_id,
             'filepath': filepath,
             'source_media': source_media.value
         }
 
         # Output the header
-        self.output(filepath, source_media, header, namespace='header')
+        self.output(filepath, source_media, message, namespace='header', **kwargs)
