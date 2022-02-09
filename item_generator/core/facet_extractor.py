@@ -41,7 +41,7 @@ class FacetExtractor(BaseExtractor):
 
     def __init__(self, conf: dict):
         super().__init__(conf)
-        self.header_deduplicate = conf.get('header_deduplication', False)
+        self.header_deduplication = conf.get('header_deduplication', False)
         self.collection_id_cache = TTLCache(
             maxsize=conf.get('CAHCE_MAX_SIZE', 5),
             ttl=conf.get('CACHE_MAX_AGE', 30)
@@ -100,7 +100,7 @@ class FacetExtractor(BaseExtractor):
 
         return metadata
 
-    def process_file(self, filepath: str, source_media: str = 'POSIX', **kwargs):
+    def process_file(self, filepath: str, source_media: StorageType = StorageType.POSIX, **kwargs):
         """
         Method to outline the processing pipeline for an individual file
         :param filepath:
@@ -181,7 +181,7 @@ class FacetExtractor(BaseExtractor):
         header = {
             'collection_id': coll_id,
             'filepath': filepath,
-            'source_media': source_media
+            'source_media': source_media.value
         }
 
         # Output the header
