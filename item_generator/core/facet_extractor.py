@@ -174,7 +174,7 @@ class FacetExtractor(BaseExtractor):
         # If deduplication enabled, check LRU cache and pass relevant kwargs
         kwargs = {
                     'deduplicate': False,
-                    'id': item_id
+                    'id': coll_id
                 }
         if self.header_deduplication:
             # Check if id is in the cache
