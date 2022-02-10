@@ -177,9 +177,11 @@ class FacetExtractor(BaseExtractor):
                     'id': item_id
                 }
         if self.header_deduplication:
-            if coll_id in list(self.collection_id_cache.keys()):
+            # Check if id is in the cache
+            if self.collection_id_cache.get(coll_id):
                 kwargs['deduplicate'] = True
-            self.collection_id_cache.update({coll_id: None})
+            # add a dummy value to the cache of equal to True.
+            self.collection_id_cache.update({coll_id: True})
 
         message = {
             'collection_id': coll_id,
