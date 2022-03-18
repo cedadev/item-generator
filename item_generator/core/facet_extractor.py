@@ -92,7 +92,7 @@ class FacetExtractor(BaseExtractor):
 
         return tags
 
-    def get_sumaries(self, item_id: str, description: 'ItemDescription') -> Dict:
+    def get_summaries(self, item_id: str, description: 'ItemDescription') -> Dict:
 
         processor = self._load_processor()
 
@@ -116,24 +116,25 @@ class FacetExtractor(BaseExtractor):
         description = self.item_descriptions.get_description(filepath)
 
         # Get summaries - aggregated properties from assets.
-        summaries = self.get_sumaries(kwargs['item_id'], description)
+        summaries = self.get_summaries(kwargs['item_id'], description)
 
-        processor_output = self.run_processors(filepath, description, source_media, **kwargs)
+        # processor_output = self.run_processors(filepath, description, source_media, **kwargs)
 
-        properties = processor_output.get('properties', {})
+        # properties = processor_output.get('properties', {})
+        properties = {}
 
         # Generate title and description properties from templates
         templates = description.facets.templates
 
-        if properties and templates:
+        if templates:
             if templates.title:
                 title_template = templates.title
                 title = Template(title_template).safe_substitute(properties)
-                summaries['title'] = title
+                properties['title'] = title
             if templates.description:
                 desc_template = templates.description
                 desc = Template(desc_template).safe_substitute(properties)
-                summaries['description'] = desc
+                properties['description'] = desc
 
         # Get collection id
         coll_id = description.collections.id
@@ -141,6 +142,7 @@ class FacetExtractor(BaseExtractor):
         # Generate item id
         if kwargs.get('item_id'):
             item_id = kwargs['item_id']
+        # This can be removed, properties no longer needed for id if passed in kwargs
         else:
             item_id = item_utils.generate_item_id_from_properties(
                 filepath,
@@ -149,23 +151,18 @@ class FacetExtractor(BaseExtractor):
                 description
             )
 
-        # Merge properties (facets from the item description) and summaries (facets from elasticsearch aggregations)
-        for key, value in properties.items():
-            if type(value) == str:
-                properties[key] = [value]
-
-        merged_properties = dict_merge(summaries, properties)
-
         body = {
                 'item_id': item_id,
                 'type': 'item',
                 'collection_id': coll_id,
-                'properties': merged_properties
+                'properties': properties
             }
+
+        merged_body = dict_merge(body, summaries)
 
         output = {
             'id': item_id,
-            'body': body
+            'body': merged_body
         }
 
         # Output the item
