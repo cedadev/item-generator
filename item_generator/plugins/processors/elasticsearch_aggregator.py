@@ -9,6 +9,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from asset_scanner.core.processor import BaseAggregationProcessor
 from asset_scanner.core.types import SpatialExtent, TemporalExtent
+from asset_scanner.core.processor import ItemDescription
 from elasticsearch import Elasticsearch
 
 from typing import Optional, List, Dict
@@ -282,7 +283,7 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
 
         return extent
 
-    def run(self, file_id: str, description: 'ItemDescription') -> Dict:
+    def run(self, file_id: str, description: ItemDescription) -> Dict:
         """
         Run the processor
         :param file_id: Collection ID to aggregate on
