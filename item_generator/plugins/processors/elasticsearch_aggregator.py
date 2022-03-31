@@ -9,7 +9,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from asset_scanner.core.processor import BaseAggregationProcessor
 from asset_scanner.core.types import SpatialExtent, TemporalExtent
-from asset_scanner.core.processor import ItemDescription
+from asset_scanner.core.item_describer import ItemDescription
 from elasticsearch import Elasticsearch
 
 from typing import Optional, List, Dict
