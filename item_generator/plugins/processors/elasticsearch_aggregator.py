@@ -268,18 +268,18 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         query['aggs'] = self.time_range_query()
 
         # BBOX query
-        query['aggs'].update(self.bbox_query())
+        # query['aggs'].update(self.bbox_query())
 
         result = self.es.search(index=self.index, body=query)
 
         extent = {}
         temporal_extent = self.get_temporal_extent(result)
-        spatial_extent = self.get_spatial_extent(result)
+        # spatial_extent = self.get_spatial_extent(result)
 
         if temporal_extent:
             extent['temporal'] = temporal_extent
-        if spatial_extent:
-            extent['spatial'] = spatial_extent
+        # if spatial_extent:
+        #     extent['spatial'] = spatial_extent
 
         return extent
 
