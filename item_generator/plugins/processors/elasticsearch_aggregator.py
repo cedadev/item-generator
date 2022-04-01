@@ -47,9 +47,11 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
+        
+        self.kwargs = kwargs
         self.es = Elasticsearch(**kwargs['connection_kwargs'])
         self.index = kwargs['index']
+        self.aggregate = kwargs.get('aggregate', True)
 
     def get_page(self, query: Dict, facet: str, result_list: List) -> List:
         """
@@ -229,7 +231,7 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         Extract the spatial extent from the Elasticsearch response.
 
         :param response: Elasticsearch result
-        :return: [[minLon, minLat, maxLon, maxLat]]
+        :return: [[minLon, minLat, maxLon, maxLat, (minHeight), (maxHeight)]]
         """
         bbox_list = []
         try:
@@ -283,6 +285,14 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
 
         return extent
 
+    def get_asset_properties(self, file_id: str):
+
+        query = self.base_query(file_id=file_id)
+        result = self.es.search(index=self.index, body=query)
+        asset = result['hits']['hits'][0]
+        properties = asset['_source']['properties']
+        return properties
+
     def run(self, file_id: str, description: ItemDescription) -> Dict:
         """
         Run the processor
@@ -290,16 +300,18 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         :param description: ItemDescription containing keys to summarise
         """
         metadata = {}
+        if self.aggregate:
+            # Get list of aggregation facets and extra top level facets
+            facets = set(description.facets.aggregation_facets + description.facets.search_facets)
 
-        # Get list of aggregation facets and extra top level facets
-        facets = set(description.facets.aggregation_facets + description.facets.search_facets)
-
-        # Poll elasticsearch for value list for each facet
-        summaries = {}
-        for facet in facets:
-            values = self.get_facet_values(facet, file_id)
-            if values:
-                summaries[facet] = values
+            # Poll elasticsearch for value list for each facet
+            summaries = {}
+            for facet in facets:
+                values = self.get_facet_values(facet, file_id)
+                if values:
+                    summaries[facet] = values
+        else:
+            summaries = self.get_asset_properties(file_id)
 
         # Get extent aggregation
         extent = self.get_extent(file_id)

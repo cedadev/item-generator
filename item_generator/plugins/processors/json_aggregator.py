@@ -41,6 +41,7 @@ class JSONAggregator(BaseAggregationProcessor):
             values = self.get_facet_values(facet, file_id)
             if values:
                 summaries[facet] = values
-
-        return summaries
-        
+        body = {
+            "properties": summaries
+        }
+        return body
