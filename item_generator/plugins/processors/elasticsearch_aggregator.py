@@ -9,6 +9,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from asset_scanner.core.processor import BaseAggregationProcessor
 from asset_scanner.core.types import SpatialExtent, TemporalExtent
+from asset_scanner.core.item_describer import ItemDescription
 from elasticsearch import Elasticsearch
 
 from typing import Optional, List, Dict
@@ -46,9 +47,11 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
+        
+        self.kwargs = kwargs
         self.es = Elasticsearch(**kwargs['connection_kwargs'])
         self.index = kwargs['index']
+        self.aggregate = kwargs.get('aggregate', True)
 
     def get_page(self, query: Dict, facet: str, result_list: List) -> List:
         """
@@ -115,7 +118,7 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
             },
             "max_datetime": {
                 "max": {"field": "properties.datetime"}
-            }
+            },
         }
 
     @staticmethod
@@ -123,7 +126,21 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         """
         Query to extract the BBOX from items
         """
-        return {}
+        return {
+            "bbox": {
+                "composite": {
+                    "sources": [
+                        {
+                            "bbox": {
+                                "terms": {
+                                    "field": "properties.bbox.keyword"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
 
     @staticmethod
     def facet_composite_query(facet: str) -> Dict:
@@ -214,9 +231,32 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         Extract the spatial extent from the Elasticsearch response.
 
         :param response: Elasticsearch result
-        :return: [[minLon, minLat, maxLon, maxLat]]
+        :return: [[minLon, minLat, maxLon, maxLat, (minHeight), (maxHeight)]]
         """
-        ...
+        bbox_list = []
+        try:
+            buckets = response['aggregations']['bbox']['buckets']
+            bbox_list.extend(bucket['key']['bbox'] for bucket in buckets)
+        except KeyError:
+            return
+
+        south_degrees = []
+        west_degrees = []
+        north_degrees = []
+        east_degrees = []
+
+        for bbox in bbox_list:
+            bbox = eval(bbox)
+            south_degrees.append(bbox[0])
+            west_degrees.append(bbox[1])
+            north_degrees.append(bbox[2])
+            east_degrees.append(bbox[3])
+        return [[
+            min(south_degrees),
+            min(west_degrees),
+            max(north_degrees),
+            max(east_degrees)
+        ]]
 
     def get_extent(self, file_id: str) -> Dict:
         """
@@ -230,42 +270,55 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         query['aggs'] = self.time_range_query()
 
         # BBOX query
-        query['aggs'].update(self.bbox_query())
+        # query['aggs'].update(self.bbox_query())
 
         result = self.es.search(index=self.index, body=query)
 
         extent = {}
         temporal_extent = self.get_temporal_extent(result)
-        spatial_extent = self.get_spatial_extent(result)
+        # spatial_extent = self.get_spatial_extent(result)
 
         if temporal_extent:
             extent['temporal'] = temporal_extent
-        if spatial_extent:
-            extent['spatial'] = spatial_extent
+        # if spatial_extent:
+        #     extent['spatial'] = spatial_extent
 
         return extent
 
-    def run(self, file_id: str, description: 'ItemDescription') -> Dict:
+    def get_asset_properties(self, file_id: str):
+
+        query = self.base_query(file_id=file_id)
+        result = self.es.search(index=self.index, body=query)
+        asset = result['hits']['hits'][0]
+        properties = asset['_source']['properties']
+        return properties
+
+    def run(self, file_id: str, description: ItemDescription) -> Dict:
         """
         Run the processor
         :param file_id: Collection ID to aggregate on
         :param description: ItemDescription containing keys to summarise
         """
+        metadata = {}
+        if self.aggregate:
+            # Get list of aggregation facets and extra top level facets
+            facets = set(description.facets.aggregation_facets + description.facets.search_facets)
 
-        # Get list of aggregation facets and extra top level facets
-        facets = set(description.facets.aggregation_facets + description.facets.search_facets)
-
-        # Poll elasticsearch for value list for each facet
-        summaries = {}
-        for facet in facets:
-            values = self.get_facet_values(facet, file_id)
-            if values:
-                summaries[facet] = values
+            # Poll elasticsearch for value list for each facet
+            summaries = {}
+            for facet in facets:
+                values = self.get_facet_values(facet, file_id)
+                if values:
+                    summaries[facet] = values
+        else:
+            summaries = self.get_asset_properties(file_id)
 
         # Get extent aggregation
         extent = self.get_extent(file_id)
         if extent.get('temporal'):
             summaries['start_datetime'] = extent['temporal'][0][0]
             summaries['end_datetime'] = extent['temporal'][0][1]
-
-        return summaries
+        if extent.get('spatial'):
+            summaries['bbox'] = str(extent['spatial'][0])
+        metadata['properties'] = summaries
+        return metadata
