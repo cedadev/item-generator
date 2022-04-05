@@ -47,7 +47,7 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
+
         self.kwargs = kwargs
         self.es = Elasticsearch(**kwargs['connection_kwargs'])
         self.index = kwargs['index']
@@ -127,19 +127,18 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         Query to extract the BBOX from items
         """
         return {
-            "bbox": {
-                "composite": {
-                    "sources": [
-                        {
-                            "bbox": {
-                                "terms": {
-                                    "field": "properties.bbox.keyword"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
+            "min_lon": {
+                "min": {"field": "properties.min_lon"}
+            },
+            "min_lat": {
+                "min": {"field": "properties.min_lat"}
+            },
+            "max_lon": {
+                "max": {"field": "properties.max_lon"}
+            },
+            "max_lat": {
+                "max": {"field": "properties.max_lat"}
+            },
         }
 
     @staticmethod
@@ -233,30 +232,28 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         :param response: Elasticsearch result
         :return: [[minLon, minLat, maxLon, maxLat, (minHeight), (maxHeight)]]
         """
-        bbox_list = []
-        try:
-            buckets = response['aggregations']['bbox']['buckets']
-            bbox_list.extend(bucket['key']['bbox'] for bucket in buckets)
-        except KeyError:
-            return
+        aggs = response['aggregations']
 
-        south_degrees = []
-        west_degrees = []
-        north_degrees = []
-        east_degrees = []
+        if aggs:
+            min_lon = aggs['min_lon']['value']
+            min_lat = aggs['min_lat']['value']
+            max_lon = aggs['max_lon']['value']
+            max_lat = aggs['max_lat']['value']
+            bbox = [
+                min_lon,
+                min_lat,
+                max_lon,
+                max_lat
+            ]
 
-        for bbox in bbox_list:
-            bbox = eval(bbox)
-            south_degrees.append(bbox[0])
-            west_degrees.append(bbox[1])
-            north_degrees.append(bbox[2])
-            east_degrees.append(bbox[3])
-        return [[
-            min(south_degrees),
-            min(west_degrees),
-            max(north_degrees),
-            max(east_degrees)
-        ]]
+            if all(bbox):
+                return dict(
+                    bbox=bbox,
+                    min_lon=min_lon,
+                    min_lat=min_lat,
+                    max_lon=max_lon,
+                    max_lat=max_lat
+                )
 
     def get_extent(self, file_id: str) -> Dict:
         """
@@ -269,19 +266,19 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         # Time range query
         query['aggs'] = self.time_range_query()
 
-        # BBOX query
-        # query['aggs'].update(self.bbox_query())
+        # bounding box coordinate query
+        query['aggs'].update(self.bbox_query())
 
         result = self.es.search(index=self.index, body=query)
 
         extent = {}
         temporal_extent = self.get_temporal_extent(result)
-        # spatial_extent = self.get_spatial_extent(result)
+        spatial_extent = self.get_spatial_extent(result)
 
         if temporal_extent:
             extent['temporal'] = temporal_extent
-        # if spatial_extent:
-        #     extent['spatial'] = spatial_extent
+        if spatial_extent:
+            extent['spatial'] = spatial_extent
 
         return extent
 
@@ -315,10 +312,17 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
 
         # Get extent aggregation
         extent = self.get_extent(file_id)
+
         if extent.get('temporal'):
             summaries['start_datetime'] = extent['temporal'][0][0]
             summaries['end_datetime'] = extent['temporal'][0][1]
+
         if extent.get('spatial'):
-            summaries['bbox'] = str(extent['spatial'][0])
+            summaries['min_lon'] = extent['spatial']['min_lon']
+            summaries['min_lat'] = extent['spatial']['min_lat']
+            summaries['max_lon'] = extent['spatial']['max_lon']
+            summaries['max_lat'] = extent['spatial']['max_lat']
+            metadata['bbox'] = extent['spatial']['bbox']
+
         metadata['properties'] = summaries
         return metadata
