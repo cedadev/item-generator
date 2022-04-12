@@ -20,9 +20,8 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import logging
 
 from asset_scanner.core.extractor import BaseExtractor
-from asset_scanner.core.item_describer import ItemDescription, ItemDescriptions
-from asset_scanner.core.processor import BaseProcessor
-from asset_scanner.core.utils import dict_merge, dot2dict, generate_id
+from asset_scanner.core.item_describer import ItemDescription
+from asset_scanner.core.utils import dict_merge, generate_id
 from asset_scanner.types.source_media import StorageType
 
 from asset_scanner.plugins.extraction_methods import utils as item_utils
@@ -92,7 +91,7 @@ class FacetExtractor(BaseExtractor):
 
         return tags
 
-    def get_summaries(self, item_id: str, description: 'ItemDescription') -> Dict:
+    def get_summaries(self, item_id: str, description: ItemDescription) -> Dict:
 
         processor = self._load_processor()
 
@@ -126,14 +125,13 @@ class FacetExtractor(BaseExtractor):
         # Generate title and description properties from templates
         templates = description.facets.templates
 
+        # Populate the templates with values from properties
         if templates:
             if templates.title:
-                title_template = templates.title
-                title = Template(title_template).safe_substitute(properties)
+                title = Template(templates.title).safe_substitute(properties)
                 properties['title'] = title
             if templates.description:
-                desc_template = templates.description
-                desc = Template(desc_template).safe_substitute(properties)
+                desc = Template(templates.description).safe_substitute(properties)
                 properties['description'] = desc
 
         # Get collection id
