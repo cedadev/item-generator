@@ -7,7 +7,7 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from asset_scanner.core.processor import BaseAggregationProcessor
+from asset_scanner.core.aggregation_processor import BaseAggregationProcessor
 from asset_scanner.core.types import SpatialExtent, TemporalExtent
 from asset_scanner.core.item_describer import ItemDescription
 from elasticsearch import Elasticsearch
@@ -53,21 +53,19 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         self.index = kwargs['index']
         self.aggregate = kwargs.get('aggregate', True)
 
-    def get_page(self, query: Dict, facet: str, result_list: List) -> List:
+    def get_facet_list(self, result: Dict, facet: str) -> List:
         """
         Get page of aggregations and parse the results
         :param query: Elasticsearch query to execute
         :param facet: Facet to retrieve values for
         :param result_list: list to extend with any found values
         """
-
-        result = self.es.search(index=self.index, body=query)
-
+        facet_list = []
         if result['aggregations']:
-            buckets = result['aggregations']['facet']['buckets']
-            result_list.extend([bucket['key'][facet] for bucket in buckets])
+            buckets = result['aggregations'][facet]['buckets']
+            facet_list.extend([bucket['key'][facet] for bucket in buckets])
 
-            return result['aggregations']['facet'].get('after_key')
+            return facet_list
 
     @staticmethod
     def base_query(file_id: str) -> Dict:
@@ -79,24 +77,24 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         return {
             "query": {
                 "bool": {
-                "must_not": [
+                    "must_not": [
                     {
-                    "term": {
-                        "categories.keyword": {
-                        "value": "hidden"
+                        "term": {
+                            "categories.keyword": {
+                                "value": "hidden"
+                            }
                         }
-                    }
-                    }
-                ],
-                "must": [
-                    {
-                    "term": {
-                        "item_id.keyword": {
-                        "value": file_id
                         }
-                    }
-                    }
-                ]
+                    ],
+                    "must": [
+                        {
+                            "term": {
+                                "item_id.keyword": {
+                                    "value": file_id
+                                }
+                            }
+                        }
+                    ]
                 }
             }
         }
@@ -148,23 +146,21 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         :param facet: Facet to aggregate on
         """
         return {
-            "facet": {
-                "composite": {
-                    "sources": [
-                        {
-                            facet: {
-                                "terms": {
-                                    "field": f"properties.{facet}.keyword"
-                                }
+            "composite": {
+                "sources": [
+                    {
+                        facet: {
+                            "terms": {
+                                "field": f"properties.{facet}.keyword"
                             }
                         }
-                    ],
-                    "size": 100
-                }
+                    }
+                ],
+                "size": 100
             }
         }
 
-    def get_facet_values(self, facet: str, file_id: str) -> List:
+    def get_facet_values(self, facets: list, file_id: str) -> Dict:
         """
         Query elasticsearch and scroll the aggregation response
         to get all the values for the given facet within the given
@@ -174,19 +170,25 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         :param file_id: Collection ID
         :return: List of values for the facet
         """
+        summaries = {}
 
         query = self.base_query(file_id)
-        query['aggs'] = self.facet_composite_query(facet)
 
-        facet_values = []
+        # Build facet aggregation query
+        query['aggs'] = {}
+        for facet in facets:
+            query['aggs'][facet] = self.facet_composite_query(facet)
 
-        after_key = self.get_page(query, facet, facet_values)
+        # Get aggregation results
+        resp = self.es.search(index=self.index, body=query)
 
-        while after_key:
-            query['aggs']['facet']['composite']['after'] = after_key
-            after_key = self.get_page(query, facet, facet_values)
+        # Aggregrate the values
+        for facet in facets:
+            facet_list = self.get_facet_list(resp, facet)
+            if facet_list:
+                summaries[facet] = facet_list
 
-        return facet_values
+        return summaries
 
     @staticmethod
     def get_temporal_extent(response) -> Optional[TemporalExtent]:
@@ -297,18 +299,11 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
         :param description: ItemDescription containing keys to summarise
         """
         metadata = {}
-        if self.aggregate:
-            # Get list of aggregation facets and extra top level facets
-            facets = set(description.facets.aggregation_facets + description.facets.search_facets)
+        # Get list of aggregation facets and extra top level facets
+        facets = description.facets.item_facets
 
-            # Poll elasticsearch for value list for each facet
-            summaries = {}
-            for facet in facets:
-                values = self.get_facet_values(facet, file_id)
-                if values:
-                    summaries[facet] = values
-        else:
-            summaries = self.get_asset_properties(file_id)
+        # Poll elasticsearch for value list for each facet
+        summaries = self.get_facet_values(facets, file_id)
 
         # Get extent aggregation
         extent = self.get_extent(file_id)
@@ -325,4 +320,5 @@ class ElasticsearchAggregator(BaseAggregationProcessor):
             metadata['bbox'] = extent['spatial']['bbox']
 
         metadata['properties'] = summaries
+
         return metadata
